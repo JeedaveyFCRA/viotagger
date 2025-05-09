@@ -317,42 +317,80 @@ function renderTags() {
       }
     });
 
-    // Add resize handle
-    const handle = document.createElement("div");
-    handle.className = "resize-handle br";
-    box.appendChild(handle);
+const handlePositions = ["tl", "tr", "bl", "br"];
 
-    // Resize logic
-    let isResizing = false;
-    handle.addEventListener("mousedown", (e) => {
-      e.stopPropagation();
-      isResizing = true;
-    });
+handlePositions.forEach(pos => {
+  const handle = document.createElement("div");
+  handle.className = `resize-handle ${pos}`;
+  box.appendChild(handle);
 
-    window.addEventListener("mousemove", (e) => {
+  let isResizing = false;
+
+  handle.addEventListener("mousedown", (e) => {
+    e.stopPropagation();
+    isResizing = true;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startLeft = parseInt(box.style.left);
+    const startTop = parseInt(box.style.top);
+    const startWidth = parseInt(box.style.width);
+    const startHeight = parseInt(box.style.height);
+
+    function doResize(moveEvent) {
       if (!isResizing) return;
-      const rect = imageContainer.getBoundingClientRect();
-      const startX = parseInt(box.style.left);
-      const startY = parseInt(box.style.top);
-      const newWidth = e.clientX - rect.left - startX;
-      const newHeight = e.clientY - rect.top - startY;
+
+      const dx = moveEvent.clientX - startX;
+      const dy = moveEvent.clientY - startY;
+
+      let newLeft = startLeft;
+      let newTop = startTop;
+      let newWidth = startWidth;
+      let newHeight = startHeight;
+
+      if (pos.includes("l")) {
+        newLeft += dx;
+        newWidth -= dx;
+      }
+      if (pos.includes("r")) {
+        newWidth += dx;
+      }
+      if (pos.includes("t")) {
+        newTop += dy;
+        newHeight -= dy;
+      }
+      if (pos.includes("b")) {
+        newHeight += dy;
+      }
+
+      // Enforce minimum size
+      newWidth = Math.max(20, newWidth);
+      newHeight = Math.max(20, newHeight);
+
+      box.style.left = `${newLeft}px`;
+      box.style.top = `${newTop}px`;
       box.style.width = `${newWidth}px`;
       box.style.height = `${newHeight}px`;
+
+      tag.x = Math.round(newLeft);
+      tag.y = Math.round(newTop);
       tag.width = Math.round(newWidth);
       tag.height = Math.round(newHeight);
       updateTagLog();
-    });
+    }
 
-    window.addEventListener("mouseup", () => {
-      if (isResizing) {
-        isResizing = false;
-        saveAllProgress();
-      }
-    });
+    function stopResize() {
+      isResizing = false;
+      saveAllProgress();
+      window.removeEventListener("mousemove", doResize);
+      window.removeEventListener("mouseup", stopResize);
+    }
 
-    imageContainer.appendChild(box);
+    window.addEventListener("mousemove", doResize);
+    window.addEventListener("mouseup", stopResize);
   });
-}
+});
+
 
 
 function updateTagLog() {

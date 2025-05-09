@@ -177,17 +177,18 @@ body {
 /* 🟦 Resize Handles */
 .resize-handle {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  background: #000;
+  width: 12px;
+  height: 12px;
+  background: #007bff;
   border-radius: 50%;
-  z-index: 11;
+  z-index: 10;
 }
 
-.resize-handle.top-left { top: -5px; left: -5px; cursor: nwse-resize; }
-.resize-handle.top-right { top: -5px; right: -5px; cursor: nesw-resize; }
-.resize-handle.bottom-left { bottom: -5px; left: -5px; cursor: nesw-resize; }
-.resize-handle.bottom-right { bottom: -5px; right: -5px; cursor: nwse-resize; }
+.resize-handle.tl { top: -6px; left: -6px; cursor: nwse-resize; }
+.resize-handle.tr { top: -6px; right: -6px; cursor: nesw-resize; }
+.resize-handle.bl { bottom: -6px; left: -6px; cursor: nesw-resize; }
+.resize-handle.br { bottom: -6px; right: -6px; cursor: nwse-resize; }
+
 
 /* 📋 Right Panel */
 #right-panel {
