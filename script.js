@@ -17,7 +17,7 @@ const saveTagBtn = document.getElementById("saveTag");
 const cancelTagBtn = document.getElementById("cancelTag");
 const statusBox = document.getElementById("status-message");
 
-// ========== INITIAL LOAD ==========
+// ========== INITIALLOAD ==========
 loadAllProgress();
 
 // ========== IMAGE DRAWING ==========
