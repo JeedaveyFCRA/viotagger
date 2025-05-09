@@ -1,7 +1,5 @@
 // ========== GLOBAL STATE ==========
-
 console.log("imageMap loaded?", typeof imageMap !== "undefined" ? "✅ Yes" : "❌ No");
-
 
 let isDrawing = false;
 let isMultiSelectMode = false;
@@ -27,17 +25,13 @@ loadAllProgress();
 // ========== IMAGE DRAWING ==========
 imageContainer.addEventListener("mousedown", (e) => {
   e.preventDefault();
-
   if (e.target.classList.contains("resize-handle")) return;
-
-  // ✅ If clicking on an existing box → just select it
   if (e.target.classList.contains("draw-box")) {
     clearSelection();
     e.target.classList.add("selected");
     return;
   }
 
-  // 👇 Begin drawing a new box
   clearSelection();
   isDrawing = true;
   const rect = imageContainer.getBoundingClientRect();
@@ -50,7 +44,6 @@ imageContainer.addEventListener("mousedown", (e) => {
   currentBox.style.top = `${startY}px`;
   imageContainer.appendChild(currentBox);
 });
-
 
 imageContainer.addEventListener("mousemove", (e) => {
   if (!isDrawing || !currentBox) return;
@@ -69,7 +62,6 @@ imageContainer.addEventListener("mouseup", (e) => {
   if (!isDrawing || !currentBox) return;
   isDrawing = false;
 
-  const boxRect = currentBox.getBoundingClientRect();
   if (currentBox.offsetWidth < 10 || currentBox.offsetHeight < 10) {
     imageContainer.removeChild(currentBox);
     currentBox = null;
@@ -128,12 +120,12 @@ function showStatus(msg, duration = 3000) {
   setTimeout(() => statusBox.style.display = "none", duration);
 }
 
-// ========== DROPDOWN CHAIN LOGIC ==========
+// ========== DROPDOWN LOGIC ==========
 const bureauSelect = document.getElementById("bureauSelect");
 const creditorSelect = document.getElementById("creditorSelect");
 const dateSelect = document.getElementById("dateSelect");
 
-bureauSelect.addEventListener("change", function () {
+bureauSelect.addEventListener("change", () => {
   const bureau = bureauSelect.value;
   console.log("Bureau selected:", bureau);
   console.log("Available creditors for bureau:", imageMap[bureau]);
@@ -145,19 +137,15 @@ bureauSelect.addEventListener("change", function () {
 
   if (imageMap[bureau]) {
     Object.keys(imageMap[bureau]).forEach((creditorCode) => {
-      console.log("Adding creditor:", creditorCode);
       const option = document.createElement("option");
       option.value = creditorCode;
       option.textContent = creditorCode;
       creditorSelect.appendChild(option);
     });
-  } else {
-    console.warn("No creditors found for this bureau");
   }
 });
 
-
-creditorSelect.addEventListener("change", function () {
+creditorSelect.addEventListener("change", () => {
   const bureau = bureauSelect.value;
   const creditor = creditorSelect.value;
 
@@ -174,7 +162,8 @@ creditorSelect.addEventListener("change", function () {
   }
 });
 
-// ========== POPULATE DROPDOWN WITH HINTS ==========
+// ========== HINTS + POPUP ==========
+
 function populateDropdown() {
   violationPreset.innerHTML = '<option disabled selected>Select a violation</option>';
   if (!imageName.includes("-")) return;
@@ -202,8 +191,7 @@ function renderHints() {
   hintLookup[bureauCode].forEach((hint) => {
     const div = document.createElement("div");
     div.className = `hint-box ${hint.severity === '🔴' ? 'severe' :
-                                hint.severity === '🟠' ? 'serious' :
-                                'minor'}`;
+                                hint.severity === '🟠' ? 'serious' : 'minor'}`;
     div.innerHTML = `
       <div class="hint-label">${hint.label}</div>
       <div class="hint-codes">${hint.covers.join(", ")}</div>
@@ -213,12 +201,18 @@ function renderHints() {
   });
 }
 
+function showPopup(x, y) {
+  popup.style.left = `${x + 10}px`;
+  popup.style.top = `${y + 10}px`;
+  popup.style.display = "block";
+  populateDropdown();
+}
 
 // ========== IMAGE LOADING ==========
 document.getElementById("loadRemoteImage").addEventListener("click", () => {
-  const bureau = document.getElementById("bureauSelect").value;
-  const creditor = document.getElementById("creditorSelect").value;
-  const datePage = document.getElementById("dateSelect").value;
+  const bureau = bureauSelect.value;
+  const creditor = creditorSelect.value;
+  const datePage = dateSelect.value;
 
   if (!bureau || !creditor || !datePage) {
     alert("Please select Bureau, Creditor, and Date/Page.");
@@ -233,13 +227,13 @@ document.getElementById("loadRemoteImage").addEventListener("click", () => {
 
   reportImg.onload = () => {
     clearCanvas();
-    popup.style.display = "none";             // 2. Hide any open popup
-    clearSelection();                         // 3. Unselect any leftover box
+    popup.style.display = "none";
+    clearSelection();
     tagData = allImageData[imageName] || [];
     renderTags();
     updateTagLog();
     populateDropdown();
-    renderHints(); // ✅ call the fix for left panel
+    renderHints();
     showStatus(`✅ Loaded image: ${imageName}`, 3000);
   };
 
@@ -247,8 +241,6 @@ document.getElementById("loadRemoteImage").addEventListener("click", () => {
     showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 });
-
-
 
 // ========== LOCAL STORAGE ==========
 function saveAllProgress() {
@@ -270,9 +262,10 @@ function loadAllProgress() {
   }
 }
 
-// ========== CANVAS / RENDERING HELPERS ==========
+// ========== CANVAS ==========
+
 function clearCanvas() {
-  [...imageContainer.querySelectorAll(".draw-box")].forEach((el) => el.remove());
+  [...imageContainer.querySelectorAll(".draw-box")].forEach(el => el.remove());
 }
 
 function clearSelection() {
@@ -282,7 +275,7 @@ function clearSelection() {
 function renderTags() {
   clearCanvas();
 
-  tagData.forEach((tag, index) => {
+  tagData.forEach((tag) => {
     const box = document.createElement("div");
     box.className = "draw-box";
     box.style.left = `${tag.x}px`;
@@ -290,7 +283,7 @@ function renderTags() {
     box.style.width = `${tag.width}px`;
     box.style.height = `${tag.height}px`;
 
-    // Make box draggable
+    // Drag logic
     let offsetX, offsetY, isDragging = false;
     box.addEventListener("mousedown", (e) => {
       if (e.target.classList.contains("resize-handle")) return;
@@ -321,159 +314,135 @@ function renderTags() {
       }
     });
 
-const handlePositions = ["tl", "tr", "bl", "br"];
+    // Add four resize handles
+    ["tl", "tr", "bl", "br"].forEach(pos => {
+      const handle = document.createElement("div");
+      handle.className = `resize-handle ${pos}`;
+      box.appendChild(handle);
 
-handlePositions.forEach(pos => {
-  const handle = document.createElement("div");
-  handle.className = `resize-handle ${pos}`;
-  box.appendChild(handle);
+      let isResizing = false;
 
-  let isResizing = false;
+      handle.addEventListener("mousedown", (e) => {
+        e.stopPropagation();
+        isResizing = true;
 
-  handle.addEventListener("mousedown", (e) => {
-    e.stopPropagation();
-    isResizing = true;
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startLeft = parseInt(box.style.left);
+        const startTop = parseInt(box.style.top);
+        const startWidth = parseInt(box.style.width);
+        const startHeight = parseInt(box.style.height);
 
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startLeft = parseInt(box.style.left);
-    const startTop = parseInt(box.style.top);
-    const startWidth = parseInt(box.style.width);
-    const startHeight = parseInt(box.style.height);
+        function doResize(moveEvent) {
+          if (!isResizing) return;
 
-    function doResize(moveEvent) {
-      if (!isResizing) return;
+          const dx = moveEvent.clientX - startX;
+          const dy = moveEvent.clientY - startY;
 
-      const dx = moveEvent.clientX - startX;
-      const dy = moveEvent.clientY - startY;
+          let newLeft = startLeft;
+          let newTop = startTop;
+          let newWidth = startWidth;
+          let newHeight = startHeight;
 
-      let newLeft = startLeft;
-      let newTop = startTop;
-      let newWidth = startWidth;
-      let newHeight = startHeight;
+          if (pos.includes("l")) {
+            newLeft += dx;
+            newWidth -= dx;
+          }
+          if (pos.includes("r")) {
+            newWidth += dx;
+          }
+          if (pos.includes("t")) {
+            newTop += dy;
+            newHeight -= dy;
+          }
+          if (pos.includes("b")) {
+            newHeight += dy;
+          }
 
-      if (pos.includes("l")) {
-        newLeft += dx;
-        newWidth -= dx;
-      }
-      if (pos.includes("r")) {
-        newWidth += dx;
-      }
-      if (pos.includes("t")) {
-        newTop += dy;
-        newHeight -= dy;
-      }
-      if (pos.includes("b")) {
-        newHeight += dy;
-      }
+          newWidth = Math.max(20, newWidth);
+          newHeight = Math.max(20, newHeight);
 
-      // Enforce minimum size
-      newWidth = Math.max(20, newWidth);
-      newHeight = Math.max(20, newHeight);
+          box.style.left = `${newLeft}px`;
+          box.style.top = `${newTop}px`;
+          box.style.width = `${newWidth}px`;
+          box.style.height = `${newHeight}px`;
 
-      box.style.left = `${newLeft}px`;
-      box.style.top = `${newTop}px`;
-      box.style.width = `${newWidth}px`;
-      box.style.height = `${newHeight}px`;
+          tag.x = Math.round(newLeft);
+          tag.y = Math.round(newTop);
+          tag.width = Math.round(newWidth);
+          tag.height = Math.round(newHeight);
+          updateTagLog();
+        }
 
-      tag.x = Math.round(newLeft);
-      tag.y = Math.round(newTop);
-      tag.width = Math.round(newWidth);
-      tag.height = Math.round(newHeight);
-      updateTagLog();
-    }
+        function stopResize() {
+          isResizing = false;
+          saveAllProgress();
+          window.removeEventListener("mousemove", doResize);
+          window.removeEventListener("mouseup", stopResize);
+        }
 
-    function stopResize() {
-      isResizing = false;
-      saveAllProgress();
-      window.removeEventListener("mousemove", doResize);
-      window.removeEventListener("mouseup", stopResize);
-    }
+        window.addEventListener("mousemove", doResize);
+        window.addEventListener("mouseup", stopResize);
+      });
+    });
 
-    window.addEventListener("mousemove", doResize);
-    window.addEventListener("mouseup", stopResize);
+    imageContainer.appendChild(box);
   });
-});
-
-
+}
 
 function updateTagLog() {
   const log = document.getElementById("tag-log");
   log.innerHTML = "";
-
-  tagData.forEach((tag, index) => {
+  tagData.forEach(tag => {
     const div = document.createElement("div");
     div.className = "tag-entry";
-
     const severity = tag.severity || "❓";
     const label = tag.label || "(No label)";
     const codes = tag.codes?.join(", ") || "(No codes)";
     const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.height ?? "?"}`;
-
     div.innerHTML = `
       <div class="tag-label">${severity} <strong>${label}</strong></div>
       <div class="tag-codes">${codes}</div>
       <div class="tag-position">${pos}</div>
     `;
-
     log.appendChild(div);
   });
 }
 
-
-function showPopup(x, y) {
-  popup.style.left = `${x + 10}px`;
-  popup.style.top = `${y + 10}px`;
-  popup.style.display = "block";
-  populateDropdown();
-}
-
-// ========== TOP BUTTON FUNCTIONALITY ==========
-
-// Delete selected box from canvas and data
+// ========== TOP PANEL BUTTONS ==========
 document.getElementById("deleteSelected").addEventListener("click", () => {
   const selectedBox = imageContainer.querySelector(".draw-box.selected");
   if (!selectedBox) return showStatus("⚠️ No box selected", 3000);
-
   const x = parseInt(selectedBox.style.left);
   const y = parseInt(selectedBox.style.top);
-
-  // Remove from tagData
   tagData = tagData.filter(tag => tag.x !== x || tag.y !== y);
   allImageData[imageName] = tagData;
-
   selectedBox.remove();
   updateTagLog();
   saveAllProgress();
   showStatus("🗑️ Tag deleted", 3000);
 });
 
-// Clear all boxes for this image
 document.getElementById("clearImageData").addEventListener("click", () => {
   if (!confirm("Are you sure you want to delete all tags for this image?")) return;
-
   tagData = [];
   allImageData[imageName] = [];
   clearCanvas();
   updateTagLog();
   saveAllProgress();
-  showStatus("🧹 All tags cleared for this image", 3000);
+  showStatus("🧹 All tags cleared", 3000);
 });
 
-// Manually save all progress
 document.getElementById("saveProgress").addEventListener("click", () => {
   saveAllProgress();
   showStatus("💾 Progress saved", 2000);
 });
 
-// Export current image's tags to CSV
 document.getElementById("exportCSV").addEventListener("click", () => {
   if (!tagData.length) return showStatus("⚠️ No data to export", 3000);
-
   const rows = [
     ["Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height"]
   ];
-
   tagData.forEach(tag => {
     rows.push([
       imageName,
@@ -486,16 +455,12 @@ document.getElementById("exportCSV").addEventListener("click", () => {
       tag.height
     ]);
   });
-
   const csvContent = rows.map(r => r.join(",")).join("\n");
   const blob = new Blob([csvContent], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
-
   const link = document.createElement("a");
   link.href = url;
   link.download = `${imageName.replace(".png", "")}_tags.csv`;
   link.click();
   URL.revokeObjectURL(url);
-  });
 });
-
