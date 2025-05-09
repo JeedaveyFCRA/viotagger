@@ -496,5 +496,6 @@ document.getElementById("exportCSV").addEventListener("click", () => {
   link.download = `${imageName.replace(".png", "")}_tags.csv`;
   link.click();
   URL.revokeObjectURL(url);
+  });
 });
 
