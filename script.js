@@ -22,10 +22,18 @@ loadAllProgress();
 
 // ========== IMAGE DRAWING ==========
 imageContainer.addEventListener("mousedown", (e) => {
-  e.preventDefault(); // 👈 disables default browser selection behavior (blue box highlight)
+  e.preventDefault();
 
-  if (e.target.classList.contains("draw-box") || e.target.classList.contains("resize-handle")) return;
+  if (e.target.classList.contains("resize-handle")) return;
 
+  // ✅ If clicking on an existing box → just select it
+  if (e.target.classList.contains("draw-box")) {
+    clearSelection();
+    e.target.classList.add("selected");
+    return;
+  }
+
+  // 👇 Begin drawing a new box
   clearSelection();
   isDrawing = true;
   const rect = imageContainer.getBoundingClientRect();
@@ -38,6 +46,7 @@ imageContainer.addEventListener("mousedown", (e) => {
   currentBox.style.top = `${startY}px`;
   imageContainer.appendChild(currentBox);
 });
+
 
 imageContainer.addEventListener("mousemove", (e) => {
   if (!isDrawing || !currentBox) return;
@@ -69,7 +78,7 @@ imageContainer.addEventListener("mouseup", (e) => {
 // ========== POPUP TAGGING ==========
 saveTagBtn.addEventListener("click", () => {
   const selectedIndex = violationPreset.selectedIndex;
-  if (selectedIndex <= 0) return showStatus("⚠️ Please select a violation", 4000);
+  if (selectedIndex <= 0) return showStatus(⚠️ Please select a violation", 4000);
 
   const hint = currentHints[selectedIndex - 1];
   const rect = currentBox.getBoundingClientRect();
