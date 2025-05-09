@@ -562,13 +562,9 @@ document.getElementById("saveProgress").addEventListener("click", () => {
 });
 
 document.getElementById("exportCSV").addEventListener("click", () => {
-  if (!tagData.length) return showStatus("⚠️ No data to export", 3000);
-  const rows = [
-    ["Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height"]
-  ];
-  tagData.forEach(tag => {
-    rows.push([
-      imageName,
+  const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
+    return tags.map(tag => [
+      imgName,
       tag.severity,
       tag.label,
       tag.codes.join("; "),
@@ -578,12 +574,21 @@ document.getElementById("exportCSV").addEventListener("click", () => {
       tag.height
     ]);
   });
+
+  if (!allTags.length) return showStatus("⚠️ No data to export", 3000);
+
+  const rows = [
+    ["Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height"],
+    ...allTags
+  ];
+
   const csvContent = rows.map(r => r.join(",")).join("\n");
   const blob = new Blob([csvContent], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
+
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${imageName.replace(".png", "")}_tags.csv`;
+  link.download = `violation_tags_export.csv`;
   link.click();
   URL.revokeObjectURL(url);
 });
