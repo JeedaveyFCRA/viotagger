@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Viotagger</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 🔝 Top Panel -->
+  <div id="top-panel">
+    <div class="control-panel">
+      <label for="loadImage" class="button">📁 Load Image</label>
+      <input type="file" id="loadImage" accept=".png,.jpg,.jpeg" style="display:none" />
+      <button id="exportCSV" class="button">📤 Export CSV</button>
+      <button id="toggleMultiSelect" class="button">🔘 Multi: OFF</button>
+      <button id="deleteSelected" class="button">🗑️ Delete Selected</button>
+      <button id="clearImageData" class="button">🧹 Clear Image Data</button>
+      <button id="saveProgress" class="button">💾 Save Progress</button>
+      <button id="syncAirtable" class="button">📡 Sync to Airtable</button>
+    </div>
+    <div id="status-message"></div>
+  </div>
+
+  <!-- ⬇ Main Wrapper: Left + Center + Right -->
+  <div id="main-wrapper">
+    <!-- 🧠 Left Panel: Hints + Log -->
+    <div id="left-panel">
+      <div id="sidebar-hints">
+        <!-- What to Look For (EQ) -->
+      </div>
+      <div id="tag-log">
+        <!-- Saved tag summaries -->
+      </div>
+    </div>
+
+    <!-- 🎯 Center Panel: Image Canvas -->
+    <div id="image-viewer">
+      <div id="image-container">
+        <img id="report-img" src="" alt="Credit Report Page" />
+        <!-- Drawn boxes go here -->
+      </div>
+    </div>
+
+    <!-- 📋 Right Panel: Dropdowns -->
+    <div id="right-panel">
+      <div id="selector-panel">
+        <label for="bureauSelect">Bureau:</label>
+        <select id="bureauSelect">
+          <option disabled selected>Select Bureau</option>
+          <option>Equifax</option>
+          <option>Experian</option>
+          <option>TransUnion</option>
+        </select>
+
+        <label for="creditorSelect">Creditor:</label>
+        <select id="creditorSelect" disabled>
+          <option disabled selected>Select Creditor</option>
+        </select>
+
+        <label for="dateSelect">Date + Page:</label>
+        <select id="dateSelect" disabled>
+          <option disabled selected>Select Date/Page</option>
+        </select>
+
+        <button id="loadRemoteImage">📷 Load PNG</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔽 Popup Dropdown for Tagging -->
+  <div id="popup">
+    <select id="violationPreset">
+      <option disabled selected>Select a violation</option>
+    </select>
+    <button id="saveTag">✅ Save Tag</button>
+    <button id="cancelTag">❌ Cancel</button>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="hintLookup.js"></script>
+  <script src="imageMap.js"></script>
+</body>
+</html>
