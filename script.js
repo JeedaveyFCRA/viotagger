@@ -166,31 +166,64 @@ function populateDropdown() {
   });
 }
 
+function renderHints() {
+  const sidebar = document.getElementById("sidebar-hints");
+  sidebar.innerHTML = "";
+
+  const bureauCode = imageName.includes("-EQ-") ? "EQ" :
+                     imageName.includes("-EX-") ? "EX" :
+                     imageName.includes("-TU-") ? "TU" : null;
+
+  if (!bureauCode || !hintLookup[bureauCode]) return;
+
+  hintLookup[bureauCode].forEach((hint) => {
+    const div = document.createElement("div");
+    div.className = `hint-box ${hint.severity === '🔴' ? 'severe' :
+                                hint.severity === '🟠' ? 'serious' :
+                                'minor'}`;
+    div.innerHTML = `
+      <div class="hint-label">${hint.label}</div>
+      <div class="hint-codes">${hint.covers.join(", ")}</div>
+      <div class="hint-action">${hint.action}</div>
+    `;
+    sidebar.appendChild(div);
+  });
+}
+
+
 // ========== IMAGE LOADING ==========
 document.getElementById("loadRemoteImage").addEventListener("click", () => {
-  const bureau = bureauSelect.value;
-  const creditor = creditorSelect.value;
-  const datePage = dateSelect.value;
+  const bureau = document.getElementById("bureauSelect").value;
+  const creditor = document.getElementById("creditorSelect").value;
+  const datePage = document.getElementById("dateSelect").value;
 
-  if (!bureau || !creditor || !datePage) return alert("Please select all fields.");
+  if (!bureau || !creditor || !datePage) {
+    alert("Please select Bureau, Creditor, and Date/Page.");
+    return;
+  }
 
   const bureauCode = bureau === "Equifax" ? "EQ" : bureau === "Experian" ? "EX" : "TU";
   imageName = `${creditor}-${bureauCode}-${datePage}.png`;
-  const path = `https://your-github-repo.com/assets/images/${bureau}/${imageName}`;
 
-  reportImg.src = path;
+  const imagePath = `/assets/images/${bureau}/${imageName}`;
+  reportImg.src = imagePath;
+
   reportImg.onload = () => {
     clearCanvas();
     tagData = allImageData[imageName] || [];
     renderTags();
     updateTagLog();
     populateDropdown();
-    showStatus(`✅ Loaded: ${imageName}`, 3000);
+    renderHints(); // ✅ call the fix for left panel
+    showStatus(`✅ Loaded image: ${imageName}`, 3000);
   };
+
   reportImg.onerror = () => {
-    showStatus("❌ Image failed to load.", 4000);
+    showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 });
+
+
 
 // ========== LOCAL STORAGE ==========
 function saveAllProgress() {
