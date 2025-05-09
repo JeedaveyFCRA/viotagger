@@ -131,6 +131,9 @@ const dateSelect = document.getElementById("dateSelect");
 
 bureauSelect.addEventListener("change", function () {
   const bureau = bureauSelect.value;
+  console.log("Bureau selected:", bureau);
+  console.log("Available creditors for bureau:", imageMap[bureau]);
+
   creditorSelect.innerHTML = '<option disabled selected>Select Creditor</option>';
   creditorSelect.disabled = false;
   dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
@@ -138,13 +141,17 @@ bureauSelect.addEventListener("change", function () {
 
   if (imageMap[bureau]) {
     Object.keys(imageMap[bureau]).forEach((creditorCode) => {
+      console.log("Adding creditor:", creditorCode);
       const option = document.createElement("option");
       option.value = creditorCode;
       option.textContent = creditorCode;
       creditorSelect.appendChild(option);
     });
+  } else {
+    console.warn("No creditors found for this bureau");
   }
 });
+
 
 creditorSelect.addEventListener("change", function () {
   const bureau = bureauSelect.value;
