@@ -1,4 +1,8 @@
 // ========== GLOBAL STATE ==========
+
+console.log("imageMap loaded?", typeof imageMap !== "undefined" ? "✅ Yes" : "❌ No");
+
+
 let isDrawing = false;
 let isMultiSelectMode = false;
 let startX, startY;
