@@ -78,7 +78,7 @@ imageContainer.addEventListener("mouseup", (e) => {
 // ========== POPUP TAGGING ==========
 saveTagBtn.addEventListener("click", () => {
   const selectedIndex = violationPreset.selectedIndex;
-  if (selectedIndex <= 0) return showStatus(⚠️ Please select a violation", 4000);
+  if (selectedIndex <= 0) return showStatus("⚠️ Please select a violation", 4000);
 
   const hint = currentHints[selectedIndex - 1];
   const rect = currentBox.getBoundingClientRect();
