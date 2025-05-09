@@ -299,3 +299,74 @@ function showPopup(x, y) {
   popup.style.display = "block";
   populateDropdown();
 }
+
+// ========== TOP BUTTON FUNCTIONALITY ==========
+
+// Delete selected box from canvas and data
+document.getElementById("deleteSelected").addEventListener("click", () => {
+  const selectedBox = imageContainer.querySelector(".draw-box.selected");
+  if (!selectedBox) return showStatus("⚠️ No box selected", 3000);
+
+  const x = parseInt(selectedBox.style.left);
+  const y = parseInt(selectedBox.style.top);
+
+  // Remove from tagData
+  tagData = tagData.filter(tag => tag.x !== x || tag.y !== y);
+  allImageData[imageName] = tagData;
+
+  selectedBox.remove();
+  updateTagLog();
+  saveAllProgress();
+  showStatus("🗑️ Tag deleted", 3000);
+});
+
+// Clear all boxes for this image
+document.getElementById("clearImageData").addEventListener("click", () => {
+  if (!confirm("Are you sure you want to delete all tags for this image?")) return;
+
+  tagData = [];
+  allImageData[imageName] = [];
+  clearCanvas();
+  updateTagLog();
+  saveAllProgress();
+  showStatus("🧹 All tags cleared for this image", 3000);
+});
+
+// Manually save all progress
+document.getElementById("saveProgress").addEventListener("click", () => {
+  saveAllProgress();
+  showStatus("💾 Progress saved", 2000);
+});
+
+// Export current image's tags to CSV
+document.getElementById("exportCSV").addEventListener("click", () => {
+  if (!tagData.length) return showStatus("⚠️ No data to export", 3000);
+
+  const rows = [
+    ["Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height"]
+  ];
+
+  tagData.forEach(tag => {
+    rows.push([
+      imageName,
+      tag.severity,
+      tag.label,
+      tag.codes.join("; "),
+      tag.x,
+      tag.y,
+      tag.width,
+      tag.height
+    ]);
+  });
+
+  const csvContent = rows.map(r => r.join(",")).join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${imageName.replace(".png", "")}_tags.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+});
+
