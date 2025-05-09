@@ -22,7 +22,10 @@ loadAllProgress();
 
 // ========== IMAGE DRAWING ==========
 imageContainer.addEventListener("mousedown", (e) => {
+  e.preventDefault(); // 👈 disables default browser selection behavior (blue box highlight)
+
   if (e.target.classList.contains("draw-box") || e.target.classList.contains("resize-handle")) return;
+
   clearSelection();
   isDrawing = true;
   const rect = imageContainer.getBoundingClientRect();
@@ -210,6 +213,8 @@ document.getElementById("loadRemoteImage").addEventListener("click", () => {
 
   reportImg.onload = () => {
     clearCanvas();
+    popup.style.display = "none";             // 2. Hide any open popup
+    clearSelection();                         // 3. Unselect any leftover box
     tagData = allImageData[imageName] || [];
     renderTags();
     updateTagLog();
@@ -262,6 +267,13 @@ function renderTags() {
     box.style.top = `${tag.y}px`;
     box.style.width = `${tag.width}px`;
     box.style.height = `${tag.height}px`;
+
+    box.addEventListener("click", function (e) {
+      e.stopPropagation(); // prevent background click
+      clearSelection();
+      box.classList.add("selected");
+    });
+
     imageContainer.appendChild(box);
   });
 }
