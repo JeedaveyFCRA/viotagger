@@ -260,7 +260,9 @@ function clearSelection() {
 }
 
 function renderTags() {
-  tagData.forEach(tag => {
+  clearCanvas();
+
+  tagData.forEach((tag, index) => {
     const box = document.createElement("div");
     box.className = "draw-box";
     box.style.left = `${tag.x}px`;
@@ -268,30 +270,98 @@ function renderTags() {
     box.style.width = `${tag.width}px`;
     box.style.height = `${tag.height}px`;
 
-    box.addEventListener("click", function (e) {
-      e.stopPropagation(); // prevent background click
+    // Make box draggable
+    let offsetX, offsetY, isDragging = false;
+    box.addEventListener("mousedown", (e) => {
+      if (e.target.classList.contains("resize-handle")) return;
+      e.stopPropagation();
+      isDragging = true;
+      offsetX = e.offsetX;
+      offsetY = e.offsetY;
       clearSelection();
       box.classList.add("selected");
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const rect = imageContainer.getBoundingClientRect();
+      const newX = e.clientX - rect.left - offsetX;
+      const newY = e.clientY - rect.top - offsetY;
+      box.style.left = `${newX}px`;
+      box.style.top = `${newY}px`;
+      tag.x = Math.round(newX);
+      tag.y = Math.round(newY);
+      updateTagLog();
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (isDragging) {
+        isDragging = false;
+        saveAllProgress();
+      }
+    });
+
+    // Add resize handle
+    const handle = document.createElement("div");
+    handle.className = "resize-handle br";
+    box.appendChild(handle);
+
+    // Resize logic
+    let isResizing = false;
+    handle.addEventListener("mousedown", (e) => {
+      e.stopPropagation();
+      isResizing = true;
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isResizing) return;
+      const rect = imageContainer.getBoundingClientRect();
+      const startX = parseInt(box.style.left);
+      const startY = parseInt(box.style.top);
+      const newWidth = e.clientX - rect.left - startX;
+      const newHeight = e.clientY - rect.top - startY;
+      box.style.width = `${newWidth}px`;
+      box.style.height = `${newHeight}px`;
+      tag.width = Math.round(newWidth);
+      tag.height = Math.round(newHeight);
+      updateTagLog();
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (isResizing) {
+        isResizing = false;
+        saveAllProgress();
+      }
     });
 
     imageContainer.appendChild(box);
   });
 }
 
+
 function updateTagLog() {
   const log = document.getElementById("tag-log");
   log.innerHTML = "";
-  tagData.forEach(tag => {
+
+  tagData.forEach((tag, index) => {
     const div = document.createElement("div");
     div.className = "tag-entry";
+
+    const severity = tag.severity || "❓";
+    const label = tag.label || "(No label)";
+    const codes = tag.codes?.join(", ") || "(No codes)";
+    const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.height ?? "?"}`;
+
     div.innerHTML = `
-      <div class="tag-label">${tag.severity} <strong>${tag.label}</strong></div>
-      <div class="tag-codes">${tag.codes.join(", ")}</div>
-      <div class="tag-position">(${tag.x}, ${tag.y}) | ${tag.width}×${tag.height}</div>
+      <div class="tag-label">${severity} <strong>${label}</strong></div>
+      <div class="tag-codes">${codes}</div>
+      <div class="tag-position">${pos}</div>
     `;
+
     log.appendChild(div);
   });
 }
+
 
 function showPopup(x, y) {
   popup.style.left = `${x + 10}px`;
