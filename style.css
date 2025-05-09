@@ -184,10 +184,11 @@ body {
   z-index: 10;
 }
 
-.resize-handle.tl { top: -6px; left: -6px; cursor: nwse-resize; }
-.resize-handle.tr { top: -6px; right: -6px; cursor: nesw-resize; }
-.resize-handle.bl { bottom: -6px; left: -6px; cursor: nesw-resize; }
-.resize-handle.br { bottom: -6px; right: -6px; cursor: nwse-resize; }
+/* INSIDE each corner by aligning to 0 offset */
+.resize-handle.tl { top: 0; left: 0; cursor: nwse-resize; }
+.resize-handle.tr { top: 0; right: 0; cursor: nesw-resize; }
+.resize-handle.bl { bottom: 0; left: 0; cursor: nesw-resize; }
+.resize-handle.br { bottom: 0; right: 0; cursor: nwse-resize; }
 
 
 /* 📋 Right Panel */
