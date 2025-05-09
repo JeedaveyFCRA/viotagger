@@ -68,6 +68,7 @@ imageContainer.addEventListener("mouseup", (e) => {
     return;
   }
 
+makeBoxInteractive(currentBox, tagData);  // ✅ Add this
   showPopup(e.clientX, e.clientY);
 });
 
@@ -389,6 +390,128 @@ function renderTags() {
     imageContainer.appendChild(box);
   });
 }
+
+
+function makeBoxInteractive(box, tagArray) {
+  let offsetX, offsetY, isDragging = false;
+
+  box.addEventListener("mousedown", (e) => {
+    if (e.target.classList.contains("resize-handle")) return;
+    e.stopPropagation();
+    isDragging = true;
+    offsetX = e.offsetX;
+    offsetY = e.offsetY;
+    clearSelection();
+    box.classList.add("selected");
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    const rect = imageContainer.getBoundingClientRect();
+    const newX = e.clientX - rect.left - offsetX;
+    const newY = e.clientY - rect.top - offsetY;
+    box.style.left = `${newX}px`;
+    box.style.top = `${newY}px`;
+
+    const tag = tagArray.find(t =>
+      t.x === parseInt(box.dataset.x) &&
+      t.y === parseInt(box.dataset.y)
+    );
+
+    if (tag) {
+      tag.x = Math.round(newX);
+      tag.y = Math.round(newY);
+      updateTagLog();
+    }
+  });
+
+  window.addEventListener("mouseup", () => {
+    if (isDragging) {
+      isDragging = false;
+      saveAllProgress();
+    }
+  });
+
+  // Add resize handles
+  ["tl", "tr", "bl", "br"].forEach(pos => {
+    const handle = document.createElement("div");
+    handle.className = `resize-handle ${pos}`;
+    box.appendChild(handle);
+
+    let isResizing = false;
+
+    handle.addEventListener("mousedown", (e) => {
+      e.stopPropagation();
+      isResizing = true;
+
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startLeft = parseInt(box.style.left);
+      const startTop = parseInt(box.style.top);
+      const startWidth = parseInt(box.style.width);
+      const startHeight = parseInt(box.style.height);
+
+      function doResize(moveEvent) {
+        if (!isResizing) return;
+
+        const dx = moveEvent.clientX - startX;
+        const dy = moveEvent.clientY - startY;
+
+        let newLeft = startLeft;
+        let newTop = startTop;
+        let newWidth = startWidth;
+        let newHeight = startHeight;
+
+        if (pos.includes("l")) {
+          newLeft += dx;
+          newWidth -= dx;
+        }
+        if (pos.includes("r")) {
+          newWidth += dx;
+        }
+        if (pos.includes("t")) {
+          newTop += dy;
+          newHeight -= dy;
+        }
+        if (pos.includes("b")) {
+          newHeight += dy;
+        }
+
+        newWidth = Math.max(20, newWidth);
+        newHeight = Math.max(20, newHeight);
+
+        box.style.left = `${newLeft}px`;
+        box.style.top = `${newTop}px`;
+        box.style.width = `${newWidth}px`;
+        box.style.height = `${newHeight}px`;
+
+        const tag = tagArray.find(t =>
+          t.x === parseInt(box.dataset.x) &&
+          t.y === parseInt(box.dataset.y)
+        );
+
+        if (tag) {
+          tag.x = Math.round(newLeft);
+          tag.y = Math.round(newTop);
+          tag.width = Math.round(newWidth);
+          tag.height = Math.round(newHeight);
+          updateTagLog();
+        }
+      }
+
+      function stopResize() {
+        isResizing = false;
+        saveAllProgress();
+        window.removeEventListener("mousemove", doResize);
+        window.removeEventListener("mouseup", stopResize);
+      }
+
+      window.addEventListener("mousemove", doResize);
+      window.addEventListener("mouseup", stopResize);
+    });
+  });
+}
+
 
 function updateTagLog() {
   const log = document.getElementById("tag-log");
