@@ -64,29 +64,35 @@ body {
   margin-bottom: 12px;
 }
 
+/* Hint Box Styling – Darker Backgrounds */
 .hint-box {
-  border-left: 5px solid #ccc;
-  background-color: #fefefe;
-  padding: 8px;
-  margin-bottom: 8px;
   border-radius: 6px;
-  font-size: 12px;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #fff;
+  font-size: 14px;
 }
 
+/* SEVERE (🔴) */
 .hint-box.severe {
-  border-color: #d9534f;
-  background-color: #fff5f5;
+  background-color: #c62828;  /* darker red */
 }
 
+/* SERIOUS (🟠) */
 .hint-box.serious {
-  border-color: #f0ad4e;
-  background-color: #fffaf0;
+  background-color: #ef6c00;  /* darker orange */
 }
 
+/* MINOR (🟡) */
 .hint-box.minor {
-  border-color: #f7e360;
-  background-color: #fefef7;
+  background-color: #f9a825;  /* deeper amber */
 }
+
+
+.hint-box {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 
 .hint-label {
   font-weight: bold;
