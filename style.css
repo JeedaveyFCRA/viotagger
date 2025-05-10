@@ -286,24 +286,22 @@ input[type="radio"] {
 
 
 
-/* 🧱 Creditor Radio Grid */
+/* 🧱 Two-column Creditor Grid */
 .creditor-grid {
   display: flex;
-  gap: 20px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  gap: 40px;
+  margin: 20px 0 10px 0; /* top margin ensures spacing from bureau section */
 }
 
 .creditor-column {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
 }
 
 .creditor-grid label {
   font-size: 14px;
 }
-
 
 
 #selector-panel label {

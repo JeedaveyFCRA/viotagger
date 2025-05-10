@@ -102,16 +102,25 @@ imageContainer.addEventListener("mousemove", (e) => {
   currentBox.style.left = `${Math.min(x, startX)}px`;
   currentBox.style.top = `${Math.min(y, startY)}px`;
 
-  // Update tag log with new live coordinates and dimensions
-  const logEntry = document.querySelector(".tag-entry.selected");
-  if (logEntry) {
-    const xCoord = Math.round(currentBox.offsetLeft);
-    const yCoord = Math.round(currentBox.offsetTop);
-    const width = Math.round(currentBox.offsetWidth);
-    const height = Math.round(currentBox.offsetHeight);
-    logEntry.querySelector(".tag-position").textContent = `(${xCoord}, ${yCoord}) | ${width}×${height}`;
+
+
+// Always update the latest tag log entry (whether selected or not)
+const logEntries = document.querySelectorAll(".tag-entry");
+if (logEntries.length > 0) {
+  const lastEntry = logEntries[logEntries.length - 1];
+  const xCoord = Math.round(currentBox.offsetLeft);
+  const yCoord = Math.round(currentBox.offsetTop);
+  const width = Math.round(currentBox.offsetWidth);
+  const height = Math.round(currentBox.offsetHeight);
+  const posDiv = lastEntry.querySelector(".tag-position");
+  if (posDiv) {
+    posDiv.textContent = `(${xCoord}, ${yCoord}) | ${width}×${height}`;
   }
-});
+}
+
+
+
+
 
 imageContainer.addEventListener("mouseup", (e) => {
   if (!isDrawing || !currentBox) return;
@@ -193,10 +202,14 @@ function showStatus(msg, duration = 3000) {
 
 
 
+
 // ========== RADIO BUTTON LOGIC ==========
 
-const creditorRadioGroup = document.querySelector("#creditorRadioGroup fieldset");
+const creditorRadioGroup = document.getElementById("creditorRadioGroup");
 const dateSelect = document.getElementById("dateSelect");
+
+// Disable all creditor radios on load
+document.querySelectorAll('input[name="creditor"]').forEach(r => r.disabled = true);
 
 // Helper to get the selected radio bureau
 function getSelectedBureau() {
@@ -219,14 +232,16 @@ document.querySelectorAll('input[name="bureau"]').forEach(radio => {
     console.log("Bureau selected:", bureau);
     console.log("Available creditors for bureau:", imageMap[bureau]);
 
-    // Enable creditor radio buttons
-    creditorRadioGroup.disabled = false;
+    // Enable all creditor radios
+    creditorRadioGroup.querySelectorAll('input[name="creditor"]').forEach(r => {
+      r.disabled = false;
+    });
 
-    // Clear previously selected creditor
+    // Clear any previously selected creditor
     const checkedCreditor = document.querySelector('input[name="creditor"]:checked');
     if (checkedCreditor) checkedCreditor.checked = false;
 
-    // Reset date options
+    // Clear and disable the Date/Page dropdown
     dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
     dateSelect.disabled = true;
   });
@@ -332,6 +347,7 @@ document.getElementById("loadRemoteImage").addEventListener("click", () => {
     showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 });
+
 
 
 
