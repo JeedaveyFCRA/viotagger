@@ -43,45 +43,45 @@ html {
   gap: 8px;
 }
 
+/* Replace your existing .button styles with these */
 .button {
-  background-color: #ffffff !important;
-  border: 1px solid #d0d0d0 !important;  /* Changed from white to light gray */
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
   padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
-  position: relative; /* For active state effect */
-
-/* Enhance hover state */
-.button:hover {
-  background-color: #f0f0f0 !important;
-  border-color: #b0b0b0 !important;
+  margin: 0 2px; /* Add small horizontal margin */
 }
 
+.button:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
 
-/* Add active/click state */
 .button:active {
   transform: translateY(1px);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
-/* Add focus state for keyboard users */
+/* Improved focus state - keeps accessibility but matches your aesthetic */
 .button:focus {
-  outline: 2px solid #007bff;
-  outline-offset: 2px;
+  outline: 2px solid rgba(0, 123, 255, 0.5); /* Semi-transparent blue */
+  outline-offset: 1px;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); /* Subtle glow */
 }
 
 
-/* Add success flash animation */
+/* Success animation - more subtle version */
 @keyframes buttonSuccess {
-  0% { background-color: #e8f5e9; }
+  0% { background-color: rgba(46, 125, 50, 0.1); }
   100% { background-color: #ffffff; }
 }
 
 .button-success {
-  animation: buttonSuccess 1.5s ease;
+  animation: buttonSuccess 1s ease-out;
 }
 
 

@@ -629,13 +629,20 @@ document.getElementById("clearAllData").addEventListener("click", () => {
 
 
 
-document.getElementById("saveProgress").addEventListener("click", () => {
-  const btn = document.getElementById("saveProgress");
-  btn.classList.add("button-success");
-  setTimeout(() => btn.classList.remove("button-success"), 1500);
+document.getElementById("saveProgress").addEventListener("click", function() {
+  const btn = this;
   
+  // Visual feedback
+  btn.classList.add("button-success");
+  
+  // Main action
   saveAllProgress();
   showStatus("💾 Progress saved", 2000);
+  
+  // Clean up animation
+  setTimeout(() => {
+    btn.classList.remove("button-success");
+  }, 1000);
 });
 
 document.getElementById("exportCSV").addEventListener("click", () => {
