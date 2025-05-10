@@ -524,6 +524,16 @@ function makeBoxInteractive(box, tagArray) {
       tag.y = Math.round(newY);
       updateTagLog();
     }
+
+    const logEntry = document.querySelector(".tag-entry.selected");
+    if (logEntry) {
+      const xCoord = Math.round(box.offsetLeft);
+      const yCoord = Math.round(box.offsetTop);
+      const width = Math.round(box.offsetWidth);
+      const height = Math.round(box.offsetHeight);
+      logEntry.querySelector(".tag-position").textContent =
+        `(${xCoord}, ${yCoord}) | ${width}×${height}`;
+    }
   });
 
   window.addEventListener("mouseup", () => {
@@ -598,6 +608,12 @@ function makeBoxInteractive(box, tagArray) {
           tag.height = Math.round(newHeight);
           updateTagLog();
         }
+
+        const logEntry = document.querySelector(".tag-entry.selected");
+        if (logEntry) {
+          logEntry.querySelector(".tag-position").textContent =
+            `(${Math.round(newLeft)}, ${Math.round(newTop)}) | ${Math.round(newWidth)}×${Math.round(newHeight)}`;
+        }
       }
 
       function stopResize() {
@@ -612,7 +628,6 @@ function makeBoxInteractive(box, tagArray) {
     });
   });
 }
-
 
 function updateTagLog() {
   const log = document.getElementById("tag-log");
