@@ -154,8 +154,8 @@ body {
   position: relative;
   width: 810px;
   height: 920px;
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: #ffffff !important; /* ✅ white fill */
+  border: 1px solid #ffffff !important; /* ✅ white borders */
   border-radius: 12px;
   overflow: hidden;
   cursor: crosshair;
