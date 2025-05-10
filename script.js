@@ -613,6 +613,22 @@ document.getElementById("clearImageData").addEventListener("click", () => {
   showStatus("🧹 All tags cleared", 3000);
 });
 
+
+
+document.getElementById("clearAllData").addEventListener("click", () => {
+  if (!confirm("Are you sure you want to delete ALL tags for EVERY image?")) return;
+  
+  // Clear all data
+  tagData = [];
+  allImageData = {};
+  clearCanvas();
+  updateTagLog();
+  saveAllProgress();
+  showStatus("🧹 ALL tags cleared from ALL images", 4000);
+});
+
+
+
 document.getElementById("saveProgress").addEventListener("click", () => {
   saveAllProgress();
   showStatus("💾 Progress saved", 2000);
