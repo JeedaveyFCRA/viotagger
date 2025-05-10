@@ -81,6 +81,7 @@ if (logEntries.length > 0) {
   }
 }
 
+});
 
 
 
