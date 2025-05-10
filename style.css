@@ -2,7 +2,7 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #fafafa;
+  background-color: #ffffff !important;
   color: #222;
 }
 
@@ -163,13 +163,14 @@ body {
   -webkit-user-drag: none;
 }
 
-/* 🔄 Explicit override for panel edges */
 .left-panel {
   border-right: 1px solid #ffffff !important;
+  box-shadow: none !important;
 }
 
 .right-panel {
   border-left: 1px solid #ffffff !important;
+  box-shadow: none !important;
 }
 
 #report-img {
@@ -275,4 +276,3 @@ body {
 }
 
 .resize-handle.br { bottom: 0; right: 0; cursor: se-resize; }
-
