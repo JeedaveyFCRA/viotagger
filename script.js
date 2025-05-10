@@ -181,33 +181,53 @@ function showStatus(msg, duration = 3000) {
   setTimeout(() => statusBox.style.display = "none", duration);
 }
 
-// ========== DROPDOWN LOGIC ==========
-const bureauSelect = document.getElementById("bureauSelect");
+
+
+
+
+
+
+
+// ========== RADIO BUTTON LOGIC ==========
+
 const creditorSelect = document.getElementById("creditorSelect");
 const dateSelect = document.getElementById("dateSelect");
 
-bureauSelect.addEventListener("change", () => {
-  const bureau = bureauSelect.value;
-  console.log("Bureau selected:", bureau);
-  console.log("Available creditors for bureau:", imageMap[bureau]);
+// Helper to get the selected radio bureau
+function getSelectedBureau() {
+  const selected = document.querySelector('input[name="bureau"]:checked');
+  return selected ? selected.value : null;
+}
 
-  creditorSelect.innerHTML = '<option disabled selected>Select Creditor</option>';
-  creditorSelect.disabled = false;
-  dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
-  dateSelect.disabled = true;
+// Watch bureau radio buttons
+document.querySelectorAll('input[name="bureau"]').forEach(radio => {
+  radio.addEventListener("change", () => {
+    const bureau = getSelectedBureau();
+    if (!bureau) return;
 
-  if (imageMap[bureau]) {
-    Object.keys(imageMap[bureau]).forEach((creditorCode) => {
-      const option = document.createElement("option");
-      option.value = creditorCode;
-      option.textContent = creditorCode;
-      creditorSelect.appendChild(option);
-    });
-  }
+    console.log("Bureau selected:", bureau);
+    console.log("Available creditors for bureau:", imageMap[bureau]);
+
+    creditorSelect.innerHTML = '<option disabled selected>Select Creditor</option>';
+    creditorSelect.disabled = false;
+
+    dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
+    dateSelect.disabled = true;
+
+    if (imageMap[bureau]) {
+      Object.keys(imageMap[bureau]).forEach((creditorCode) => {
+        const option = document.createElement("option");
+        option.value = creditorCode;
+        option.textContent = creditorCode;
+        creditorSelect.appendChild(option);
+      });
+    }
+  });
 });
 
+// Watch creditor dropdown to populate page/date
 creditorSelect.addEventListener("change", () => {
-  const bureau = bureauSelect.value;
+  const bureau = getSelectedBureau();
   const creditor = creditorSelect.value;
 
   dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
@@ -270,8 +290,9 @@ function showPopup(x, y) {
 }
 
 // ========== IMAGE LOADING ==========
+
 document.getElementById("loadRemoteImage").addEventListener("click", () => {
-  const bureau = bureauSelect.value;
+  const bureau = getSelectedBureau();
   const creditor = creditorSelect.value;
   const datePage = dateSelect.value;
 
@@ -302,6 +323,13 @@ document.getElementById("loadRemoteImage").addEventListener("click", () => {
     showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 });
+
+
+
+
+
+
+
 
 // ========== LOCAL STORAGE ==========
 function saveAllProgress() {

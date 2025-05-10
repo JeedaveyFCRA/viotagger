@@ -43,30 +43,29 @@
       </div>
     </div>
 
-    <!-- 📋 Right Panel: Dropdowns -->
-    <div id="right-panel">
-      <div id="selector-panel">
-        <label for="bureauSelect">Bureau:</label>
-        <select id="bureauSelect">
-          <option disabled selected>Select Bureau</option>
-          <option>Equifax</option>
-          <option>Experian</option>
-          <option>TransUnion</option>
-        </select>
+<!-- 📋 Right Panel: Radio Buttons for Bureau -->
+<div id="right-panel">
+  <div id="selector-panel">
+    <!-- Replace Dropdown with Radio Buttons for Bureau -->
+    <label><input type="radio" name="bureau" value="Equifax" id="equifaxRadio"> Equifax</label>
+    <label><input type="radio" name="bureau" value="Experian" id="experianRadio"> Experian</label>
+    <label><input type="radio" name="bureau" value="TransUnion" id="transunionRadio"> TransUnion</label>
 
-        <label for="creditorSelect">Creditor:</label>
-        <select id="creditorSelect" disabled>
-          <option disabled selected>Select Creditor</option>
-        </select>
+    <!-- Rest of the form remains unchanged -->
+    <label for="creditorSelect">Creditor:</label>
+    <select id="creditorSelect" disabled>
+      <option disabled selected>Select Creditor</option>
+    </select>
 
-        <label for="dateSelect">Date + Page:</label>
-        <select id="dateSelect" disabled>
-          <option disabled selected>Select Date/Page</option>
-        </select>
+    <label for="dateSelect">Date + Page:</label>
+    <select id="dateSelect" disabled>
+      <option disabled selected>Select Date/Page</option>
+    </select>
 
-        <button id="loadRemoteImage">📷 Load PNG</button>
-      </div>
-    </div>
+    <button id="loadRemoteImage">📷 Load PNG</button>
+  </div> <!-- End of #selector-panel -->
+</div> <!-- End of #right-panel -->
+
   </div>
 
   <!-- 🔽 Popup Dropdown for Tagging -->

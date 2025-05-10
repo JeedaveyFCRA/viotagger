@@ -267,6 +267,25 @@ html {
   overflow-y: auto;
 }
 
+
+/* ========== RADIO BUTTONS STYLING ========== */
+
+#bureauSelectContainer {
+  margin: 10px 0;
+}
+
+#bureauSelectContainer label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+input[type="radio"] {
+  margin-right: 5px;
+}
+
+
+
 #selector-panel label {
   display: block;
   margin: 10px 0 4px;
