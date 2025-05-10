@@ -188,9 +188,14 @@ function showStatus(msg, duration = 3000) {
 
 
 
+
+
+
+
+
 // ========== RADIO BUTTON LOGIC ==========
 
-const creditorSelect = document.getElementById("creditorSelect");
+const creditorRadioGroup = document.querySelector("#creditorRadioGroup fieldset");
 const dateSelect = document.getElementById("dateSelect");
 
 // Helper to get the selected radio bureau
@@ -199,7 +204,13 @@ function getSelectedBureau() {
   return selected ? selected.value : null;
 }
 
-// Watch bureau radio buttons
+// Helper to get selected creditor radio
+function getSelectedCreditor() {
+  const selected = document.querySelector('input[name="creditor"]:checked');
+  return selected ? selected.value : null;
+}
+
+// Enable creditor radio buttons when bureau is selected
 document.querySelectorAll('input[name="bureau"]').forEach(radio => {
   radio.addEventListener("change", () => {
     const bureau = getSelectedBureau();
@@ -208,39 +219,37 @@ document.querySelectorAll('input[name="bureau"]').forEach(radio => {
     console.log("Bureau selected:", bureau);
     console.log("Available creditors for bureau:", imageMap[bureau]);
 
-    creditorSelect.innerHTML = '<option disabled selected>Select Creditor</option>';
-    creditorSelect.disabled = false;
+    // Enable creditor radio buttons
+    creditorRadioGroup.disabled = false;
 
+    // Clear previously selected creditor
+    const checkedCreditor = document.querySelector('input[name="creditor"]:checked');
+    if (checkedCreditor) checkedCreditor.checked = false;
+
+    // Reset date options
     dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
     dateSelect.disabled = true;
-
-    if (imageMap[bureau]) {
-      Object.keys(imageMap[bureau]).forEach((creditorCode) => {
-        const option = document.createElement("option");
-        option.value = creditorCode;
-        option.textContent = creditorCode;
-        creditorSelect.appendChild(option);
-      });
-    }
   });
 });
 
-// Watch creditor dropdown to populate page/date
-creditorSelect.addEventListener("change", () => {
-  const bureau = getSelectedBureau();
-  const creditor = creditorSelect.value;
+// When a creditor is selected, update the date/page dropdown
+document.querySelectorAll('input[name="creditor"]').forEach(radio => {
+  radio.addEventListener("change", () => {
+    const bureau = getSelectedBureau();
+    const creditor = radio.value;
 
-  dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
-  dateSelect.disabled = false;
+    dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
+    dateSelect.disabled = false;
 
-  if (imageMap[bureau] && imageMap[bureau][creditor]) {
-    imageMap[bureau][creditor].forEach((datePage) => {
-      const option = document.createElement("option");
-      option.value = datePage;
-      option.textContent = datePage;
-      dateSelect.appendChild(option);
-    });
-  }
+    if (imageMap[bureau] && imageMap[bureau][creditor]) {
+      imageMap[bureau][creditor].forEach((datePage) => {
+        const option = document.createElement("option");
+        option.value = datePage;
+        option.textContent = datePage;
+        dateSelect.appendChild(option);
+      });
+    }
+  });
 });
 
 // ========== HINTS + POPUP ==========
@@ -293,7 +302,7 @@ function showPopup(x, y) {
 
 document.getElementById("loadRemoteImage").addEventListener("click", () => {
   const bureau = getSelectedBureau();
-  const creditor = creditorSelect.value;
+  const creditor = getSelectedCreditor();
   const datePage = dateSelect.value;
 
   if (!bureau || !creditor || !datePage) {
@@ -323,6 +332,16 @@ document.getElementById("loadRemoteImage").addEventListener("click", () => {
     showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 });
+
+
+
+
+
+
+
+
+
+
 
 
 

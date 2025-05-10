@@ -43,28 +43,49 @@
       </div>
     </div>
 
-<!-- 📋 Right Panel: Radio Buttons for Bureau -->
+<!-- 📋 Right Panel: Radio Buttons for Bureau and Creditor -->
 <div id="right-panel">
   <div id="selector-panel">
-    <!-- Replace Dropdown with Radio Buttons for Bureau -->
+    <!-- 📌 Bureau Selection (Radio Buttons) -->
     <label><input type="radio" name="bureau" value="Equifax" id="equifaxRadio"> Equifax</label>
     <label><input type="radio" name="bureau" value="Experian" id="experianRadio"> Experian</label>
     <label><input type="radio" name="bureau" value="TransUnion" id="transunionRadio"> TransUnion</label>
 
-    <!-- Rest of the form remains unchanged -->
-    <label for="creditorSelect">Creditor:</label>
-    <select id="creditorSelect" disabled>
-      <option disabled selected>Select Creditor</option>
-    </select>
+    <!-- 🏦 Creditor Selection (Radio Buttons in 2 Columns) -->
+    <div id="creditorRadioGroup" class="creditor-grid">
+      <fieldset disabled>
+        <legend>Creditor:</legend>
+        <div class="creditor-column">
+          <label><input type="radio" name="creditor" value="Ally"> Ally</label>
+          <label><input type="radio" name="creditor" value="Barclays"> Barclays</label>
+          <label><input type="radio" name="creditor" value="Best Buy"> Best Buy</label>
+          <label><input type="radio" name="creditor" value="BofA"> BofA</label>
+          <label><input type="radio" name="creditor" value="Citizens1"> Citizens1</label>
+          <label><input type="radio" name="creditor" value="Citizens2"> Citizens2</label>
+          <label><input type="radio" name="creditor" value="Cornerstone"> Cornerstone</label>
+        </div>
+        <div class="creditor-column">
+          <label><input type="radio" name="creditor" value="Discover Bank"> Discover Bank</label>
+          <label><input type="radio" name="creditor" value="Discover Loans"> Discover Loans</label>
+          <label><input type="radio" name="creditor" value="JPMCB"> JPMCB</label>
+          <label><input type="radio" name="creditor" value="Mariners"> Mariners</label>
+          <label><input type="radio" name="creditor" value="Sears"> Sears</label>
+          <label><input type="radio" name="creditor" value="THD"> THD</label>
+        </div>
+      </fieldset>
+    </div>
 
+    <!-- 📅 Date Selection -->
     <label for="dateSelect">Date + Page:</label>
     <select id="dateSelect" disabled>
       <option disabled selected>Select Date/Page</option>
     </select>
 
+    <!-- 📷 Load Image -->
     <button id="loadRemoteImage">📷 Load PNG</button>
   </div> <!-- End of #selector-panel -->
 </div> <!-- End of #right-panel -->
+
 
   </div>
 

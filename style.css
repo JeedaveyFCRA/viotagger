@@ -286,6 +286,26 @@ input[type="radio"] {
 
 
 
+/* 🧱 Creditor Radio Grid */
+.creditor-grid {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.creditor-column {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.creditor-grid label {
+  font-size: 14px;
+}
+
+
+
 #selector-panel label {
   display: block;
   margin: 10px 0 4px;
