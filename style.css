@@ -73,6 +73,14 @@ html {
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); /* Subtle glow */
 }
 
+/* Add to your existing button styles */
+.button:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 2px rgba(0,0,0,0.1);
+  background-color: #e0e0e0 !important;
+  transition: all 0.1s ease;
+}
+
 
 /* Success animation - more subtle version */
 @keyframes buttonSuccess {

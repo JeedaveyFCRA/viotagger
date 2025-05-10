@@ -590,9 +590,17 @@ function updateTagLog() {
 }
 
 // ========== TOP PANEL BUTTONS ==========
-document.getElementById("deleteSelected").addEventListener("click", () => {
+document.getElementById("deleteSelected").addEventListener("click", function() {
+  const btn = this;
+  btn.classList.add('button-active');
+  
   const selectedBox = imageContainer.querySelector(".draw-box.selected");
-  if (!selectedBox) return showStatus("⚠️ No box selected", 3000);
+  if (!selectedBox) {
+    showStatus("⚠️ No box selected", 3000);
+    setTimeout(() => btn.classList.remove('button-active'), 200);
+    return;
+  }
+
   const x = parseInt(selectedBox.style.left);
   const y = parseInt(selectedBox.style.top);
   tagData = tagData.filter(tag => tag.x !== x || tag.y !== y);
@@ -601,51 +609,76 @@ document.getElementById("deleteSelected").addEventListener("click", () => {
   updateTagLog();
   saveAllProgress();
   showStatus("🗑️ Tag deleted", 3000);
+  
+  setTimeout(() => {
+    btn.classList.remove('button-active');
+    btn.blur();
+  }, 200);
 });
 
-document.getElementById("clearImageData").addEventListener("click", () => {
-  if (!confirm("Are you sure you want to delete all tags for this image?")) return;
+document.getElementById("clearImageData").addEventListener("click", function() {
+  const btn = this;
+  btn.classList.add('button-active');
+  
+  if (!confirm("Are you sure you want to delete all tags for this image?")) {
+    setTimeout(() => btn.classList.remove('button-active'), 200);
+    return;
+  }
+
   tagData = [];
   allImageData[imageName] = [];
   clearCanvas();
   updateTagLog();
   saveAllProgress();
   showStatus("🧹 All tags cleared", 3000);
+  
+  setTimeout(() => {
+    btn.classList.remove('button-active');
+    btn.blur();
+  }, 200);
 });
 
-
-
-document.getElementById("clearAllData").addEventListener("click", () => {
-  if (!confirm("Are you sure you want to delete ALL tags for EVERY image?")) return;
+document.getElementById("clearAllData").addEventListener("click", function() {
+  const btn = this;
+  btn.classList.add('button-active');
   
-  // Clear all data
+  if (!confirm("Are you sure you want to delete ALL tags for EVERY image?")) {
+    setTimeout(() => btn.classList.remove('button-active'), 200);
+    return;
+  }
+
   tagData = [];
   allImageData = {};
   clearCanvas();
   updateTagLog();
   saveAllProgress();
   showStatus("🧹 ALL tags cleared from ALL images", 4000);
+  
+  setTimeout(() => {
+    btn.classList.remove('button-active');
+    btn.blur();
+  }, 200);
 });
-
-
 
 document.getElementById("saveProgress").addEventListener("click", function() {
   const btn = this;
+  btn.classList.add('button-active');
   
-  // Visual feedback
-  btn.classList.add("button-success");
-  
-  // Main action
   saveAllProgress();
   showStatus("💾 Progress saved", 2000);
   
-  // Clean up animation
   setTimeout(() => {
-    btn.classList.remove("button-success");
-  }, 1000);
+    btn.classList.remove('button-active');
+    btn.classList.add('button-success');
+    setTimeout(() => btn.classList.remove('button-success'), 1000);
+    btn.blur();
+  }, 200);
 });
 
-document.getElementById("exportCSV").addEventListener("click", () => {
+document.getElementById("exportCSV").addEventListener("click", function() {
+  const btn = this;
+  btn.classList.add('button-active');
+  
   const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
     return tags.map(tag => [
       imgName,
@@ -659,7 +692,11 @@ document.getElementById("exportCSV").addEventListener("click", () => {
     ]);
   });
 
-  if (!allTags.length) return showStatus("⚠️ No data to export", 3000);
+  if (!allTags.length) {
+    showStatus("⚠️ No data to export", 3000);
+    setTimeout(() => btn.classList.remove('button-active'), 200);
+    return;
+  }
 
   const rows = [
     ["Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height"],
@@ -675,4 +712,9 @@ document.getElementById("exportCSV").addEventListener("click", () => {
   link.download = `violation_tags_export.csv`;
   link.click();
   URL.revokeObjectURL(url);
+  
+  setTimeout(() => {
+    btn.classList.remove('button-active');
+    btn.blur();
+  }, 200);
 });
