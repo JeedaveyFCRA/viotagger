@@ -271,7 +271,7 @@ html {
 /* ========== RADIO BUTTONS STYLING ========== */
 
 #bureauSelectContainer {
-  margin: 10px 0;
+  margin: 4px 0;
 }
 
 #bureauSelectContainer label {
@@ -286,22 +286,32 @@ input[type="radio"] {
 
 
 
-/* 🧱 Two-column Creditor Grid */
-.creditor-grid {
+
+
+
+/* 🔁 NEW 3-COLUMN CREDITOR GRID */
+.creditor-grid-3col {
   display: flex;
-  gap: 40px;
-  margin: 20px 0 10px 0; /* top margin ensures spacing from bureau section */
+  justify-content: space-between;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  gap: 16px; /* tighter spacing */
 }
 
 .creditor-column {
+  width: 32%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
-.creditor-grid label {
+.creditor-column label {
   font-size: 14px;
+  line-height: 1.3;
 }
+
+
+
 
 
 #selector-panel label {
@@ -317,6 +327,15 @@ input[type="radio"] {
   font-size: 14px;
   margin-bottom: 10px;
 }
+
+
+#selector-panel label[for="dateSelect"],
+#selector-panel select,
+#selector-panel button#loadRemoteImage {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
 
 /* 🔽 Tag Popup */
 #popup {

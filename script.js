@@ -253,16 +253,22 @@ document.querySelectorAll('input[name="creditor"]').forEach(radio => {
     const bureau = getSelectedBureau();
     const creditor = radio.value;
 
+    // Clear the dropdown
     dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
-    dateSelect.disabled = false;
+    dateSelect.disabled = true;
 
+    // If matching entries exist in imageMap, populate
     if (imageMap[bureau] && imageMap[bureau][creditor]) {
-      imageMap[bureau][creditor].forEach((datePage) => {
-        const option = document.createElement("option");
-        option.value = datePage;
-        option.textContent = datePage;
-        dateSelect.appendChild(option);
-      });
+      const pages = imageMap[bureau][creditor];
+      if (pages.length > 0) {
+        pages.forEach((datePage) => {
+          const option = document.createElement("option");
+          option.value = datePage;
+          option.textContent = datePage;
+          dateSelect.appendChild(option);
+        });
+        dateSelect.disabled = false;
+      }
     }
   });
 });
