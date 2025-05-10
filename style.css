@@ -2,16 +2,39 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #fafafa;
+  background-color: #ffffff !important;
   color: #222;
 }
+
+/* ========== PAGE + PANEL FULL WHITENING FIX ========== */
+
+html {
+  background-color: #ffffff !important;
+}
+
+.container,
+.left-panel,
+.right-panel,
+.top-panel,
+#image-container {
+  background-color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.left-panel,
+.right-panel {
+  border-left: none !important;
+  border-right: none !important;
+}
+
 
 /* 🔝 Top Panel */
 #top-panel {
   width: 100%;
-  padding: 10px 20px;
-  background-color: #f0f0f0;
-  border-bottom: 1px solid #ccc;
+  padding: 10px 310px;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #ffffff !important;
 }
 
 .control-panel {
@@ -21,12 +44,13 @@ body {
 }
 
 .button {
-  background-color: #e0e0e0;
-  border: 1px solid #ccc;
+  background-color: #ffffff !important;
+  border: 1px solid #ffffff !important;
   padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
 }
 
 .button:hover {
@@ -42,6 +66,21 @@ body {
   display: none;
 }
 
+
+/* ========== TOP PANEL TITLE: LEFT SIDE ========== */
+
+#top-title {
+  position: absolute;
+  left: 20px;
+  top: 14px;
+  font-size: 24px;
+  font-weight: bold; /* Use the bold weight */
+  color: #333;
+  font-family: 'Space Grotesk', sans-serif; /* Apply Space Grotesk font */
+}
+
+
+
 /* 🧱 Main Wrapper */
 #main-wrapper {
   display: flex;
@@ -49,12 +88,13 @@ body {
   overflow: hidden;
 }
 
+
 /* 📚 Left Panel */
 #left-panel {
   width: 400px;
   padding: 10px;
-  background-color: #f7f9fc;
-  border-right: 1px solid #ccc;
+  background-color:  #ffffff !important;
+  border-right: 1px solid  #ffffff !important;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -64,38 +104,52 @@ body {
   margin-bottom: 12px;
 }
 
+/* Hint Box Styling – Darker Backgrounds */
 .hint-box {
-  border-left: 5px solid #ccc;
-  background-color: #fefefe;
-  padding: 8px;
-  margin-bottom: 8px;
   border-radius: 6px;
-  font-size: 12px;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #fff;
+  font-size: 14px;
 }
 
+/* SEVERE (🔴) */
 .hint-box.severe {
-  border-color: #d9534f;
-  background-color: #fff5f5;
+  background-color: #c62828;  /* darker red */
 }
 
+/* SERIOUS (🟠) */
 .hint-box.serious {
-  border-color: #f0ad4e;
-  background-color: #fffaf0;
+  background-color: #ef6c00;  /* darker orange */
 }
 
+/* MINOR (🟡) */
 .hint-box.minor {
-  border-color: #f7e360;
-  background-color: #fefef7;
+  background-color: #f9a825;  /* deeper amber */
+}
+
+
+.hint-box {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .hint-label {
   font-weight: bold;
   margin-bottom: 2px;
+  color: #ffffff;
 }
 
 .hint-codes {
-  font-size: 11px;
-  color: #666;
+  font-size: 10px;
+  color: #ffffff !important;  /* force white, override older gray */
+  font-weight: 500;
+}
+
+.hint-action {
+  font-size: 12px;
+  opacity: 0.95;
+  margin-top: 4px;
+  color: #ffffff;
 }
 
 /* 📋 Tag Log */
@@ -126,6 +180,19 @@ body {
   color: #999;
 }
 
+/* Style for selected tags to highlight them */
+.tag-entry.selected {
+  background-color: #e3f2fd;
+}
+
+/* Style for updating live coordinates and dimensions */
+.tag-entry .tag-position {
+  font-size: 12px;      /* Update to make it a bit more visible */
+  font-weight: bold;
+  color: #333;          /* Set it to a darker color for readability */
+}
+
+
 /* 🎯 Center Panel */
 #image-viewer {
   width: 810px;
@@ -140,8 +207,8 @@ body {
   position: relative;
   width: 810px;
   height: 920px;
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: #ffffff !important; /* ✅ white fill */
+  border: 1px solid #ffffff !important; /* ✅ white borders */
   border-radius: 12px;
   overflow: hidden;
   cursor: crosshair;
@@ -177,24 +244,26 @@ body {
 /* 🟦 Resize Handles */
 .resize-handle {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  background: #000;
+  width: 12px;
+  height: 12px;
+  background: #007bff;
   border-radius: 50%;
-  z-index: 11;
+  z-index: 10;
 }
 
-.resize-handle.top-left { top: -5px; left: -5px; cursor: nwse-resize; }
-.resize-handle.top-right { top: -5px; right: -5px; cursor: nesw-resize; }
-.resize-handle.bottom-left { bottom: -5px; left: -5px; cursor: nesw-resize; }
-.resize-handle.bottom-right { bottom: -5px; right: -5px; cursor: nwse-resize; }
+/* INSIDE each corner by aligning to 0 offset */
+.resize-handle.tl { top: 0; left: 0; cursor: nwse-resize; }
+.resize-handle.tr { top: 0; right: 0; cursor: nesw-resize; }
+.resize-handle.bl { bottom: 0; left: 0; cursor: nesw-resize; }
+.resize-handle.br { bottom: 0; right: 0; cursor: nwse-resize; }
+
 
 /* 📋 Right Panel */
 #right-panel {
   width: 400px;
   padding: 15px;
-  background-color: #fff;
-  border-left: 1px solid #ccc;
+  background-color: #ffffff !important;
+  border-left: 1px solid #ffffff !important;
   overflow-y: auto;
 }
 
@@ -250,4 +319,3 @@ body {
 }
 
 .resize-handle.br { bottom: 0; right: 0; cursor: se-resize; }
-
