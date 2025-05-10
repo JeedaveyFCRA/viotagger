@@ -143,8 +143,10 @@ saveTagBtn.addEventListener("click", () => {
   updateTagLog();
   saveAllProgress();
 
-  // 🔄 Delay makeBoxInteractive to allow DOM update
+  // 🔄 Updated box binding with tag index tracking
   const boxToBind = currentBox;
+  const tagIndex = tagData.length - 1; // Get index of the newly added tag
+  boxToBind.dataset.tagIndex = tagIndex; // Store the index on the box
   setTimeout(() => {
     if (boxToBind) makeBoxInteractive(boxToBind, tagData);
   }, 0);
@@ -376,46 +378,34 @@ function clearSelection() {
   document.querySelectorAll(".draw-box.selected").forEach(box => box.classList.remove("selected"));
 }
 
+
+
+
+
+
+
 function renderTags() {
   clearCanvas();
-
-  tagData.forEach((tag) => {
+  
+  // Ensure we're working with fresh data (recommended addition)
+  tagData = allImageData[imageName] || [];
+  
+  // Track index for proper tag association
+  tagData.forEach((tag, index) => {
     const box = document.createElement("div");
     box.className = "draw-box";
     box.style.left = `${tag.x}px`;
     box.style.top = `${tag.y}px`;
     box.style.width = `${tag.width}px`;
     box.style.height = `${tag.height}px`;
+    box.dataset.tagIndex = index; // Store index on box element
 
-    // Drag logic
-    let offsetX, offsetY, isDragging = false;
+    // Drag logic - simplified since makeBoxInteractive handles this now
     box.addEventListener("mousedown", (e) => {
       if (e.target.classList.contains("resize-handle")) return;
       e.stopPropagation();
-      isDragging = true;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
       clearSelection();
       box.classList.add("selected");
-    });
-
-    window.addEventListener("mousemove", (e) => {
-      if (!isDragging) return;
-      const rect = imageContainer.getBoundingClientRect();
-      const newX = e.clientX - rect.left - offsetX;
-      const newY = e.clientY - rect.top - offsetY;
-      box.style.left = `${newX}px`;
-      box.style.top = `${newY}px`;
-      tag.x = Math.round(newX);
-      tag.y = Math.round(newY);
-      updateTagLog();
-    });
-
-    window.addEventListener("mouseup", () => {
-      if (isDragging) {
-        isDragging = false;
-        saveAllProgress();
-      }
     });
 
     // Add four resize handles
@@ -423,80 +413,30 @@ function renderTags() {
       const handle = document.createElement("div");
       handle.className = `resize-handle ${pos}`;
       box.appendChild(handle);
-
-      let isResizing = false;
-
-      handle.addEventListener("mousedown", (e) => {
-        e.stopPropagation();
-        isResizing = true;
-
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const startLeft = parseInt(box.style.left);
-        const startTop = parseInt(box.style.top);
-        const startWidth = parseInt(box.style.width);
-        const startHeight = parseInt(box.style.height);
-
-        function doResize(moveEvent) {
-          if (!isResizing) return;
-
-          const dx = moveEvent.clientX - startX;
-          const dy = moveEvent.clientY - startY;
-
-          let newLeft = startLeft;
-          let newTop = startTop;
-          let newWidth = startWidth;
-          let newHeight = startHeight;
-
-          if (pos.includes("l")) {
-            newLeft += dx;
-            newWidth -= dx;
-          }
-          if (pos.includes("r")) {
-            newWidth += dx;
-          }
-          if (pos.includes("t")) {
-            newTop += dy;
-            newHeight -= dy;
-          }
-          if (pos.includes("b")) {
-            newHeight += dy;
-          }
-
-          newWidth = Math.max(20, newWidth);
-          newHeight = Math.max(20, newHeight);
-
-          box.style.left = `${newLeft}px`;
-          box.style.top = `${newTop}px`;
-          box.style.width = `${newWidth}px`;
-          box.style.height = `${newHeight}px`;
-
-          tag.x = Math.round(newLeft);
-          tag.y = Math.round(newTop);
-          tag.width = Math.round(newWidth);
-          tag.height = Math.round(newHeight);
-          updateTagLog();
-        }
-
-        function stopResize() {
-          isResizing = false;
-          saveAllProgress();
-          window.removeEventListener("mousemove", doResize);
-          window.removeEventListener("mouseup", stopResize);
-        }
-
-        window.addEventListener("mousemove", doResize);
-        window.addEventListener("mouseup", stopResize);
-      });
     });
 
+    // Make box interactive with proper tag association
+    makeBoxInteractive(box, tagData);
+    
     imageContainer.appendChild(box);
   });
 }
 
 
+
+
+
+
 function makeBoxInteractive(box, tagArray) {
   let offsetX, offsetY, isDragging = false;
+
+  // Store the tag index on the box when making it interactive
+  if (!box.dataset.tagIndex) {
+    const x = parseInt(box.style.left);
+    const y = parseInt(box.style.top);
+    const tagIndex = tagArray.findIndex(t => t.x === x && t.y === y);
+    if (tagIndex !== -1) box.dataset.tagIndex = tagIndex;
+  }
 
   box.addEventListener("mousedown", (e) => {
     if (e.target.classList.contains("resize-handle")) return;
@@ -516,15 +456,14 @@ function makeBoxInteractive(box, tagArray) {
     box.style.left = `${newX}px`;
     box.style.top = `${newY}px`;
 
-    const tag = tagArray.find(t =>
-      t.x === parseInt(box.dataset.x) &&
-      t.y === parseInt(box.dataset.y)
-    );
-
-    if (tag) {
-      tag.x = Math.round(newX);
-      tag.y = Math.round(newY);
-      updateTagLog();
+    // Use the stored index to directly update the tag
+    if (box.dataset.tagIndex !== undefined) {
+      const tag = tagArray[box.dataset.tagIndex];
+      if (tag) {
+        tag.x = Math.round(newX);
+        tag.y = Math.round(newY);
+        updateTagLog();
+      }
     }
 
     const logEntry = document.querySelector(".tag-entry.selected");
@@ -598,17 +537,16 @@ function makeBoxInteractive(box, tagArray) {
         box.style.width = `${newWidth}px`;
         box.style.height = `${newHeight}px`;
 
-        const tag = tagArray.find(t =>
-          t.x === parseInt(box.dataset.x) &&
-          t.y === parseInt(box.dataset.y)
-        );
-
-        if (tag) {
-          tag.x = Math.round(newLeft);
-          tag.y = Math.round(newTop);
-          tag.width = Math.round(newWidth);
-          tag.height = Math.round(newHeight);
-          updateTagLog();
+        // Use the stored index to directly update the tag
+        if (box.dataset.tagIndex !== undefined) {
+          const tag = tagArray[box.dataset.tagIndex];
+          if (tag) {
+            tag.x = Math.round(newLeft);
+            tag.y = Math.round(newTop);
+            tag.width = Math.round(newWidth);
+            tag.height = Math.round(newHeight);
+            updateTagLog();
+          }
         }
 
         const logEntry = document.querySelector(".tag-entry.selected");
@@ -631,6 +569,7 @@ function makeBoxInteractive(box, tagArray) {
   });
 }
 
+// Rest of the code remains exactly the same...
 function updateTagLog() {
   const log = document.getElementById("tag-log");
   log.innerHTML = "";
