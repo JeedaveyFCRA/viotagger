@@ -108,7 +108,10 @@ imageContainer.addEventListener("mouseup", (e) => {
 // ========== POPUP TAGGING ==========
 saveTagBtn.addEventListener("click", () => {
   const selectedIndex = violationPreset.selectedIndex;
-  if (selectedIndex <= 0) return showStatus("⚠️ Please select a violation", 4000);
+  if (selectedIndex <= 0) {
+    showStatus("⚠️ Please select a violation", 4000);
+    return;
+  }
 
   const hint = currentHints[selectedIndex - 1];
   const rect = currentBox.getBoundingClientRect();
@@ -133,13 +136,14 @@ saveTagBtn.addEventListener("click", () => {
 
   currentBox.classList.add("selected");
 
-  // ✅ Make the newly drawn box interactive immediately
+  // ✅ Ensure box is immediately draggable/resizable with real-time log sync
   makeBoxInteractive(currentBox, tagData);
 
   updateTagLog();
   saveAllProgress();
   popup.style.display = "none";
   currentBox = null;
+
   showStatus("✅ Violation tag added", 3000);
 });
 
