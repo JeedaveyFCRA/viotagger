@@ -50,7 +50,8 @@ html {
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
 }
 
 .button:hover {
@@ -328,8 +329,8 @@ input[type="radio"] {
   border: 1px #ffffff !important;
   background-color: #ffffff !important;
   border-radius: 5px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
   transition: background-color 0.2s ease;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
 }
 
 .date-button:hover {
