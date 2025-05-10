@@ -630,6 +630,10 @@ document.getElementById("clearAllData").addEventListener("click", () => {
 
 
 document.getElementById("saveProgress").addEventListener("click", () => {
+  const btn = document.getElementById("saveProgress");
+  btn.classList.add("button-success");
+  setTimeout(() => btn.classList.remove("button-success"), 1500);
+  
   saveAllProgress();
   showStatus("💾 Progress saved", 2000);
 });

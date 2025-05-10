@@ -45,18 +45,45 @@ html {
 
 .button {
   background-color: #ffffff !important;
-  border: 1px solid #ffffff !important;
+  border: 1px solid #d0d0d0 !important;  /* Changed from white to light gray */
   padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  position: relative; /* For active state effect */
+
+/* Enhance hover state */
+.button:hover {
+  background-color: #f0f0f0 !important;
+  border-color: #b0b0b0 !important;
 }
 
-.button:hover {
-  background-color: #d0d0d0;
+
+/* Add active/click state */
+.button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
+
+/* Add focus state for keyboard users */
+.button:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+
+/* Add success flash animation */
+@keyframes buttonSuccess {
+  0% { background-color: #e8f5e9; }
+  100% { background-color: #ffffff; }
+}
+
+.button-success {
+  animation: buttonSuccess 1.5s ease;
+}
+
 
 #status-message {
   margin-top: 6px;
