@@ -101,6 +101,15 @@ imageContainer.addEventListener("mouseup", (e) => {
 });
 
 
+// ========== POPUP CANCEL LOGIC ==========
+cancelTagBtn.addEventListener("click", () => {
+  if (currentBox && imageContainer.contains(currentBox)) {
+    imageContainer.removeChild(currentBox);
+  }
+  popup.style.display = "none";
+  currentBox = null;
+});
+
 
 
 
@@ -108,7 +117,7 @@ imageContainer.addEventListener("mouseup", (e) => {
 // ========== POPUP TAGGING ==========
 saveTagBtn.addEventListener("click", () => {
   const selectedIndex = violationPreset.selectedIndex;
-  if (selectedIndex <= 0) {
+  if (selectedIndex <= 0 || !currentBox) {
     showStatus("⚠️ Please select a violation", 4000);
     return;
   }
@@ -131,21 +140,20 @@ saveTagBtn.addEventListener("click", () => {
   };
 
   tagData.push(tag);
-  if (!allImageData[imageName]) allImageData[imageName] = [];
   allImageData[imageName] = tagData;
 
   currentBox.classList.add("selected");
 
-  // ✅ Ensure box is immediately draggable/resizable with real-time log sync
+  // Already interactive if made during draw, but safe to call again
   makeBoxInteractive(currentBox, tagData);
 
   updateTagLog();
   saveAllProgress();
   popup.style.display = "none";
   currentBox = null;
-
   showStatus("✅ Violation tag added", 3000);
 });
+
 
 
 
