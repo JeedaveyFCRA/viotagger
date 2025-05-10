@@ -132,27 +132,16 @@ saveTagBtn.addEventListener("click", () => {
   allImageData[imageName] = tagData;
 
   currentBox.classList.add("selected");
+
+  // ✅ Make the newly drawn box interactive immediately
+  makeBoxInteractive(currentBox, tagData);
+
   updateTagLog();
   saveAllProgress();
   popup.style.display = "none";
   currentBox = null;
   showStatus("✅ Violation tag added", 3000);
 });
-
-cancelTagBtn.addEventListener("click", () => {
-  if (currentBox) {
-    imageContainer.removeChild(currentBox);
-    currentBox = null;
-  }
-  popup.style.display = "none";
-});
-
-// ========== STATUS MESSAGES ==========
-function showStatus(msg, duration = 3000) {
-  statusBox.textContent = msg;
-  statusBox.style.display = "block";
-  setTimeout(() => statusBox.style.display = "none", duration);
-}
 
 
 
