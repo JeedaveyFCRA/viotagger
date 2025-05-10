@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Viotagger</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 🔝 Top Panel -->
+  <div id="top-panel">
+   <div id="top-title">Violation Tagging Tool</div>
+    <div class="control-panel">
+      <label for="loadImage" class="button">📁 Load Image</label>
+      <input type="file" id="loadImage" accept=".png,.jpg,.jpeg" style="display:none" />
+      <button id="exportCSV" class="button">📤 Export CSV</button>
+      <button id="toggleMultiSelect" class="button">🔘 Multi: OFF</button>
+      <button id="deleteSelected" class="button">🗑️ Delete Selected</button>
+      <button id="clearImageData" class="button">🧹 Clear Image Data</button>
+      <button id="saveProgress" class="button">💾 Save Progress</button>
+      <button id="syncAirtable" class="button">📡 Sync to Airtable</button>
+    </div>
+    <div id="status-message"></div>
+  </div>
+
+  <!-- ⬇ Main Wrapper: Left + Center + Right -->
+  <div id="main-wrapper">
+    <!-- 🧠 Left Panel: Hints + Log -->
+    <div id="left-panel">
+      <div id="sidebar-hints">
+        <!-- What to Look For (EQ) -->
+      </div>
+      <div id="tag-log">
+        <!-- Saved tag summaries -->
+      </div>
+    </div>
+
+    <!-- 🎯 Center Panel: Image Canvas -->
+    <div id="image-viewer">
+      <div id="image-container">
+        <img id="report-img" src="" alt="Credit Report Page" />
+        <!-- Drawn boxes go here -->
+      </div>
+    </div>
+
+<!-- 📋 Right Panel: Radio Buttons for Bureau and Creditor -->
+<div id="right-panel">
+  <div id="selector-panel">
+    <!-- 📌 Bureau Selection (Radio Buttons) -->
+    <label><input type="radio" name="bureau" value="Equifax" id="equifaxRadio"> Equifax</label>
+    <label><input type="radio" name="bureau" value="Experian" id="experianRadio"> Experian</label>
+    <label><input type="radio" name="bureau" value="TransUnion" id="transunionRadio"> TransUnion</label>
+
+    <!-- 🏦 Creditor Selection (2-letter visible labels, 4-column grid) -->
+    <div id="creditorRadioGroup" class="creditor-grid-4col">
+      <div class="creditor-column">
+        <label><input type="radio" name="creditor" value="AL"> AL</label>
+        <label><input type="radio" name="creditor" value="BB"> BB</label>
+        <label><input type="radio" name="creditor" value="BK"> BK</label>
+        <label><input type="radio" name="creditor" value="BY"> BY</label>
+      </div>
+      <div class="creditor-column">
+        <label><input type="radio" name="creditor" value="C1"> C1</label>
+        <label><input type="radio" name="creditor" value="C2"> C2</label>
+        <label><input type="radio" name="creditor" value="CR"> CR</label>
+      </div>
+      <div class="creditor-column">
+        <label><input type="radio" name="creditor" value="DB"> DB</label>
+        <label><input type="radio" name="creditor" value="DL"> DL</label>
+        <label><input type="radio" name="creditor" value="HD"> HD</label>
+      </div>
+      <div class="creditor-column">
+        <label><input type="radio" name="creditor" value="JP"> JP</label>
+        <label><input type="radio" name="creditor" value="MF"> MF</label>
+        <label><input type="radio" name="creditor" value="SR"> SR</label>
+      </div>
+    </div>
+
+    <!-- 📅 Date Selection -->
+    <div id="dateGroup" class="date-button-group" style="display: none;">
+      <div id="dateLabel" style="margin-bottom: 8px; font-weight: bold;">Date + Page:</div>
+      <div id="dateButtons" class="date-grid"></div>
+    </div>
+
+<!-- 🔽 Popup Dropdown for Tagging -->
+<div id="popup">
+  <select id="violationPreset">
+    <option disabled selected>Select a violation</option>
+  </select>
+  <button id="saveTag">✅ Save Tag</button>
+  <button id="cancelTag">❌ Cancel</button>
+</div>
+
+<script src="hintLookup.js"></script>
+<script src="imageMap.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,377 @@
+/* 🔤 Base Styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff !important;
+  color: #222;
+}
+
+/* ========== PAGE + PANEL FULL WHITENING FIX ========== */
+
+html {
+  background-color: #ffffff !important;
+}
+
+.container,
+.left-panel,
+.right-panel,
+.top-panel,
+#image-container {
+  background-color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.left-panel,
+.right-panel {
+  border-left: none !important;
+  border-right: none !important;
+}
+
+
+/* 🔝 Top Panel */
+#top-panel {
+  width: 100%;
+  padding: 10px 310px;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #ffffff !important;
+}
+
+.control-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.button {
+  background-color: #ffffff !important;
+  border: 1px solid #ffffff !important;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+  background-color: #d0d0d0;
+}
+
+#status-message {
+  margin-top: 6px;
+  padding: 5px 10px;
+  background-color: #e8f4ff;
+  font-size: 12px;
+  border-radius: 4px;
+  display: none;
+}
+
+
+/* ========== TOP PANEL TITLE: LEFT SIDE ========== */
+
+#top-title {
+  position: absolute;
+  left: 20px;
+  top: 14px;
+  font-size: 24px;
+  font-weight: bold; /* Use the bold weight */
+  color: #333;
+  font-family: 'Space Grotesk', sans-serif; /* Apply Space Grotesk font */
+}
+
+
+
+/* 🧱 Main Wrapper */
+#main-wrapper {
+  display: flex;
+  height: calc(100vh - 100px);
+  overflow: hidden;
+}
+
+
+/* 📚 Left Panel */
+#left-panel {
+  width: 400px;
+  padding: 10px;
+  background-color:  #ffffff !important;
+  border-right: 1px solid  #ffffff !important;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#sidebar-hints {
+  margin-bottom: 12px;
+}
+
+/* Hint Box Styling – Darker Backgrounds */
+.hint-box {
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #fff;
+  font-size: 14px;
+}
+
+/* SEVERE (🔴) */
+.hint-box.severe {
+  background-color: #c62828;  /* darker red */
+}
+
+/* SERIOUS (🟠) */
+.hint-box.serious {
+  background-color: #ef6c00;  /* darker orange */
+}
+
+/* MINOR (🟡) */
+.hint-box.minor {
+  background-color: #f9a825;  /* deeper amber */
+}
+
+
+.hint-box {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hint-label {
+  font-weight: bold;
+  margin-bottom: 2px;
+  color: #ffffff;
+}
+
+.hint-codes {
+  font-size: 10px;
+  color: #ffffff !important;  /* force white, override older gray */
+  font-weight: 500;
+}
+
+.hint-action {
+  font-size: 12px;
+  opacity: 0.95;
+  margin-top: 4px;
+  color: #ffffff;
+}
+
+/* 📋 Tag Log */
+#tag-log {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.tag-entry {
+  background-color: #f8f9fa;
+  padding: 6px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.tag-label {
+  font-weight: bold;
+}
+
+.tag-codes {
+  font-size: 11px;
+  color: #555;
+}
+
+.tag-position {
+  font-size: 10px;
+  color: #999;
+}
+
+/* Style for selected tags to highlight them */
+.tag-entry.selected {
+  background-color: #e3f2fd;
+}
+
+/* Style for updating live coordinates and dimensions */
+.tag-entry .tag-position {
+  font-size: 12px;      /* Update to make it a bit more visible */
+  font-weight: bold;
+  color: #333;          /* Set it to a darker color for readability */
+}
+
+
+/* 🎯 Center Panel */
+#image-viewer {
+  width: 810px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 10px;
+}
+
+#image-container {
+  position: relative;
+  width: 810px;
+  height: 920px;
+  background-color: #ffffff !important; /* ✅ white fill */
+  border: 1px solid #ffffff !important; /* ✅ white borders */
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#report-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 778px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 🟥 Drawn Boxes */
+.draw-box {
+  position: absolute;
+  border: 2px dashed red;
+  background-color: rgba(255, 0, 0, 0.1);
+  border-radius: 4px;
+  z-index: 10;
+  pointer-events: all;
+}
+
+.draw-box.selected {
+  border: 2px solid blue;
+  background-color: rgba(0, 0, 255, 0.1);
+}
+
+/* 🟦 Resize Handles */
+.resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #007bff;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+/* INSIDE each corner by aligning to 0 offset */
+.resize-handle.tl { top: 0; left: 0; cursor: nwse-resize; }
+.resize-handle.tr { top: 0; right: 0; cursor: nesw-resize; }
+.resize-handle.bl { bottom: 0; left: 0; cursor: nesw-resize; }
+.resize-handle.br { bottom: 0; right: 0; cursor: nwse-resize; }
+
+
+/* 📋 Right Panel */
+#right-panel {
+  width: 400px;
+  padding: 15px;
+  background-color: #ffffff !important;
+  border-left: 1px solid #ffffff !important;
+  overflow-y: auto;
+}
+
+
+/* ========== RADIO BUTTONS STYLING ========== */
+
+#bureauSelectContainer {
+  margin: 4px 0;
+}
+
+#bureauSelectContainer label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+input[type="radio"] {
+  margin-right: 5px;
+}
+
+
+
+
+
+
+.creditor-grid-4col {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 10px 30px;
+  margin: 15px 0;
+}
+.creditor-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+
+
+#selector-panel label {
+  display: block;
+  margin: 10px 0 4px;
+  font-size: 14px;
+}
+
+
+.date-button-group {
+  margin-top: 15px;
+}
+
+#dateButtons.date-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.date-button {
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid #888;
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  transition: background-color 0.2s ease;
+}
+
+.date-button:hover {
+  background-color: #e0e0e0;
+}
+
+
+
+/* 🔽 Tag Popup */
+#popup {
+  position: absolute;
+  display: none;
+  background-color: #fff;
+  border: 1px solid #888;
+  padding: 10px;
+  border-radius: 6px;
+  z-index: 20;
+  box-shadow: 0px 2px 10px rgba(0,0,0,0.2);
+}
+
+#popup select {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+#popup button {
+  margin-right: 6px;
+}
+
+.draw-box {
+  position: absolute;
+  border: 2px dashed #00f;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.resize-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #00f;
+  cursor: nwse-resize;
+  z-index: 10;
+}
+
+.resize-handle.br { bottom: 0; right: 0; cursor: se-resize; }
