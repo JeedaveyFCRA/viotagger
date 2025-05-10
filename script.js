@@ -1,4 +1,5 @@
 // ========== GLOBAL STATE ==========
+console.log("imageMap loaded?", typeof imageMap !== "undefined" ? "✅ Yes" : "❌ No");
 
 let isDrawing = false;
 let isMultiSelectMode = false;
@@ -10,7 +11,6 @@ let allImageData = {};
 let imageName = "";
 
 // ========== DOM ELEMENTS ==========
-
 const imageContainer = document.getElementById("image-container");
 const reportImg = document.getElementById("report-img");
 const popup = document.getElementById("popup");
@@ -19,55 +19,10 @@ const saveTagBtn = document.getElementById("saveTag");
 const cancelTagBtn = document.getElementById("cancelTag");
 const statusBox = document.getElementById("status-message");
 
-
-
-// ========== IMAGE LOADING ==========
-
-document.getElementById("loadRemoteImage").addEventListener("click", () => {
-  const bureau = bureauSelect.value;
-  const creditor = creditorSelect.value;
-  const datePage = dateSelect.value;
-
-  if (!bureau || !creditor || !datePage) {
-    alert("Please select Bureau, Creditor, and Date/Page.");
-    return;
-  }
-
-  const bureauCode = bureau === "Equifax" ? "EQ" : bureau === "Experian" ? "EX" : "TU";
-  imageName = `${creditor}-${bureauCode}-${datePage}.png`;
-
-  const imagePath = `/assets/images/${bureau}/${imageName}`;
-  reportImg.src = imagePath;
-
-  reportImg.onload = () => {
-    clearCanvas();
-    popup.style.display = "none";
-    clearSelection();
-    tagData = allImageData[imageName] || [];
-    renderTags();
-    updateTagLog();
-    populateDropdown();
-    renderHints();
-    showStatus(`✅ Loaded image: ${imageName}`, 3000);
-  };
-
-  reportImg.onerror = () => {
-    showStatus("❌ Image failed to load: " + imagePath, 4000);
-  };
-});
-
-
-
-
 // ========== INITIAL LOAD ==========
 loadAllProgress();
 
-
-
-
-
 // ========== IMAGE DRAWING ==========
-
 imageContainer.addEventListener("mousedown", (e) => {
   e.preventDefault();
   if (e.target.classList.contains("resize-handle")) return;
@@ -101,16 +56,6 @@ imageContainer.addEventListener("mousemove", (e) => {
   currentBox.style.height = `${height}px`;
   currentBox.style.left = `${Math.min(x, startX)}px`;
   currentBox.style.top = `${Math.min(y, startY)}px`;
-
-  // Update tag log with new live coordinates and dimensions
-  const logEntry = document.querySelector(".tag-entry.selected");
-  if (logEntry) {
-    const xCoord = Math.round(currentBox.offsetLeft);
-    const yCoord = Math.round(currentBox.offsetTop);
-    const width = Math.round(currentBox.offsetWidth);
-    const height = Math.round(currentBox.offsetHeight);
-    logEntry.querySelector(".tag-position").textContent = `(${xCoord}, ${yCoord}) | ${width}×${height}`;
-  }
 });
 
 imageContainer.addEventListener("mouseup", (e) => {
@@ -123,14 +68,9 @@ imageContainer.addEventListener("mouseup", (e) => {
     return;
   }
 
-  makeBoxInteractive(currentBox, tagData);
+makeBoxInteractive(currentBox, tagData);  // ✅ Add this
   showPopup(e.clientX, e.clientY);
 });
-
-
-
-
-
 
 // ========== POPUP TAGGING ==========
 saveTagBtn.addEventListener("click", () => {
