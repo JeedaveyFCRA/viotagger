@@ -114,13 +114,9 @@ cancelTagBtn.addEventListener("click", () => {
 
 
 
-// ========== POPUP TAGGING ==========
 saveTagBtn.addEventListener("click", () => {
   const selectedIndex = violationPreset.selectedIndex;
-  if (selectedIndex <= 0 || !currentBox) {
-    showStatus("⚠️ Please select a violation", 4000);
-    return;
-  }
+  if (selectedIndex <= 0) return showStatus("⚠️ Please select a violation", 4000);
 
   const hint = currentHints[selectedIndex - 1];
   const rect = currentBox.getBoundingClientRect();
@@ -140,19 +136,24 @@ saveTagBtn.addEventListener("click", () => {
   };
 
   tagData.push(tag);
+  if (!allImageData[imageName]) allImageData[imageName] = [];
   allImageData[imageName] = tagData;
 
   currentBox.classList.add("selected");
-
-  // Already interactive if made during draw, but safe to call again
-  makeBoxInteractive(currentBox, tagData);
-
   updateTagLog();
   saveAllProgress();
+
+  // 🔄 Delay makeBoxInteractive to allow DOM update
+  const boxToBind = currentBox;
+  setTimeout(() => {
+    if (boxToBind) makeBoxInteractive(boxToBind, tagData);
+  }, 0);
+
   popup.style.display = "none";
   currentBox = null;
   showStatus("✅ Violation tag added", 3000);
 });
+
 
 
 
