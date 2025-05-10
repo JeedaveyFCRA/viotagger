@@ -32,7 +32,7 @@ html {
 /* 🔝 Top Panel */
 #top-panel {
   width: 100%;
-  padding: 10px 120px;
+  padding: 10px 620px;
   background-color: #ffffff !important;
   border-bottom: 1px solid #ffffff !important;
 }
@@ -45,11 +45,12 @@ html {
 
 .button {
   background-color: #ffffff !important;
-  border: 1px solid #ccc;
+  border: 1px solid #ffffff !important;
   padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .button:hover {
@@ -76,8 +77,8 @@ html {
 #left-panel {
   width: 400px;
   padding: 10px;
-  background-color: #f7f9fc;
-  border-right: 1px solid #ccc;
+  background-color:  #ffffff !important;
+  border-right: 1px solid  #ffffff !important;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -232,8 +233,8 @@ html {
 #right-panel {
   width: 400px;
   padding: 15px;
-  background-color: #fff;
-  border-left: 1px solid #ccc;
+  background-color: #ffffff !important;
+  border-left: 1px solid #ffffff !important;
   overflow-y: auto;
 }
 
