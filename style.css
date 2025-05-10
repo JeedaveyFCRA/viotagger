@@ -32,7 +32,7 @@ html {
 /* 🔝 Top Panel */
 #top-panel {
   width: 100%;
-  padding: 10px 410px;
+  padding: 10px 310px;
   background-color: #ffffff !important;
   border-bottom: 1px solid #ffffff !important;
 }
@@ -66,12 +66,28 @@ html {
   display: none;
 }
 
+
+/* ========== TOP PANEL TITLE: LEFT SIDE ========== */
+
+#top-title {
+  position: absolute;
+  left: 20px;
+  top: 14px;
+  font-size: 20px;
+  font-weight: bold; /* Use the bold weight */
+  color: #333;
+  font-family: 'Space Grotesk', sans-serif; /* Apply Space Grotesk font */
+}
+
+
+
 /* 🧱 Main Wrapper */
 #main-wrapper {
   display: flex;
   height: calc(100vh - 100px);
   overflow: hidden;
 }
+
 
 /* 📚 Left Panel */
 #left-panel {
