@@ -252,8 +252,10 @@ document.querySelectorAll('input[name="creditor"]').forEach(radio => {
 
 
 function loadRemoteImage(fullImageName, bureau) {
-  imageName = fullImageName;
-  const imagePath = `/assets/images/${bureau}/${fullImageName}`;
+  // Ensure .png is only added once
+  imageName = fullImageName.endsWith(".png") ? fullImageName : `${fullImageName}.png`;
+  const imagePath = `/assets/images/${bureau}/${imageName}`;
+
   reportImg.src = imagePath;
 
   reportImg.onload = () => {
@@ -272,6 +274,7 @@ function loadRemoteImage(fullImageName, bureau) {
     showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 }
+
 
 
 
