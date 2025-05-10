@@ -163,6 +163,15 @@ body {
   -webkit-user-drag: none;
 }
 
+/* 🔄 Explicit override for panel edges */
+.left-panel {
+  border-right: 1px solid #ffffff !important;
+}
+
+.right-panel {
+  border-left: 1px solid #ffffff !important;
+}
+
 #report-img {
   position: absolute;
   top: 50%;
