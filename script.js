@@ -1,5 +1,4 @@
 // ========== GLOBAL STATE ==========
-console.log("imageMap loaded?", typeof imageMap !== "undefined" ? "✅ Yes" : "❌ No");
 
 let isDrawing = false;
 let isMultiSelectMode = false;
@@ -11,6 +10,7 @@ let allImageData = {};
 let imageName = "";
 
 // ========== DOM ELEMENTS ==========
+
 const imageContainer = document.getElementById("image-container");
 const reportImg = document.getElementById("report-img");
 const popup = document.getElementById("popup");
@@ -19,11 +19,55 @@ const saveTagBtn = document.getElementById("saveTag");
 const cancelTagBtn = document.getElementById("cancelTag");
 const statusBox = document.getElementById("status-message");
 
+
+
+// ========== IMAGE LOADING ==========
+
+document.getElementById("loadRemoteImage").addEventListener("click", () => {
+  const bureau = bureauSelect.value;
+  const creditor = creditorSelect.value;
+  const datePage = dateSelect.value;
+
+  if (!bureau || !creditor || !datePage) {
+    alert("Please select Bureau, Creditor, and Date/Page.");
+    return;
+  }
+
+  const bureauCode = bureau === "Equifax" ? "EQ" : bureau === "Experian" ? "EX" : "TU";
+  imageName = `${creditor}-${bureauCode}-${datePage}.png`;
+
+  const imagePath = `/assets/images/${bureau}/${imageName}`;
+  reportImg.src = imagePath;
+
+  reportImg.onload = () => {
+    clearCanvas();
+    popup.style.display = "none";
+    clearSelection();
+    tagData = allImageData[imageName] || [];
+    renderTags();
+    updateTagLog();
+    populateDropdown();
+    renderHints();
+    showStatus(`✅ Loaded image: ${imageName}`, 3000);
+  };
+
+  reportImg.onerror = () => {
+    showStatus("❌ Image failed to load: " + imagePath, 4000);
+  };
+});
+
+
+
+
 // ========== INITIAL LOAD ==========
 loadAllProgress();
 
+
+
+
+
 // ========== IMAGE DRAWING ==========
-// Draw boxes and update tag log live
+
 imageContainer.addEventListener("mousedown", (e) => {
   e.preventDefault();
   if (e.target.classList.contains("resize-handle")) return;
@@ -79,9 +123,13 @@ imageContainer.addEventListener("mouseup", (e) => {
     return;
   }
 
-  makeBoxInteractive(currentBox, tagData);  // ✅ Add this
+  makeBoxInteractive(currentBox, tagData);
   showPopup(e.clientX, e.clientY);
 });
+
+
+
+
 
 
 // ========== POPUP TAGGING ==========
