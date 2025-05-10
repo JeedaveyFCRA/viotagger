@@ -61,9 +61,11 @@ html {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.button:active {
+/* Button active state */
+.button-active {
+  background-color: #e0e0e0 !important;
   transform: translateY(1px);
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 /* Improved focus state - keeps accessibility but matches your aesthetic */
@@ -82,12 +84,12 @@ html {
 }
 
 
-/* Success animation - more subtle version */
 @keyframes buttonSuccess {
   0% { background-color: rgba(46, 125, 50, 0.1); }
   100% { background-color: #ffffff; }
 }
 
+/* Button success state */
 .button-success {
   animation: buttonSuccess 1s ease-out;
 }

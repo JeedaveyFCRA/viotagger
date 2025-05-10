@@ -589,6 +589,14 @@ function updateTagLog() {
   });
 }
 
+
+
+
+
+
+
+
+
 // ========== TOP PANEL BUTTONS ==========
 document.getElementById("deleteSelected").addEventListener("click", function() {
   const btn = this;
@@ -597,7 +605,10 @@ document.getElementById("deleteSelected").addEventListener("click", function() {
   const selectedBox = imageContainer.querySelector(".draw-box.selected");
   if (!selectedBox) {
     showStatus("⚠️ No box selected", 3000);
-    setTimeout(() => btn.classList.remove('button-active'), 200);
+    setTimeout(() => {
+      btn.classList.remove('button-active');
+      btn.blur();
+    }, 200);
     return;
   }
 
@@ -610,6 +621,7 @@ document.getElementById("deleteSelected").addEventListener("click", function() {
   saveAllProgress();
   showStatus("🗑️ Tag deleted", 3000);
   
+  // Reset button state
   setTimeout(() => {
     btn.classList.remove('button-active');
     btn.blur();
@@ -621,7 +633,10 @@ document.getElementById("clearImageData").addEventListener("click", function() {
   btn.classList.add('button-active');
   
   if (!confirm("Are you sure you want to delete all tags for this image?")) {
-    setTimeout(() => btn.classList.remove('button-active'), 200);
+    setTimeout(() => {
+      btn.classList.remove('button-active');
+      btn.blur();
+    }, 200);
     return;
   }
 
@@ -632,6 +647,7 @@ document.getElementById("clearImageData").addEventListener("click", function() {
   saveAllProgress();
   showStatus("🧹 All tags cleared", 3000);
   
+  // Reset button state
   setTimeout(() => {
     btn.classList.remove('button-active');
     btn.blur();
@@ -643,7 +659,10 @@ document.getElementById("clearAllData").addEventListener("click", function() {
   btn.classList.add('button-active');
   
   if (!confirm("Are you sure you want to delete ALL tags for EVERY image?")) {
-    setTimeout(() => btn.classList.remove('button-active'), 200);
+    setTimeout(() => {
+      btn.classList.remove('button-active');
+      btn.blur();
+    }, 200);
     return;
   }
 
@@ -654,6 +673,7 @@ document.getElementById("clearAllData").addEventListener("click", function() {
   saveAllProgress();
   showStatus("🧹 ALL tags cleared from ALL images", 4000);
   
+  // Reset button state
   setTimeout(() => {
     btn.classList.remove('button-active');
     btn.blur();
@@ -667,6 +687,7 @@ document.getElementById("saveProgress").addEventListener("click", function() {
   saveAllProgress();
   showStatus("💾 Progress saved", 2000);
   
+  // Reset button state with success animation
   setTimeout(() => {
     btn.classList.remove('button-active');
     btn.classList.add('button-success');
@@ -694,7 +715,10 @@ document.getElementById("exportCSV").addEventListener("click", function() {
 
   if (!allTags.length) {
     showStatus("⚠️ No data to export", 3000);
-    setTimeout(() => btn.classList.remove('button-active'), 200);
+    setTimeout(() => {
+      btn.classList.remove('button-active');
+      btn.blur();
+    }, 200);
     return;
   }
 
@@ -713,6 +737,7 @@ document.getElementById("exportCSV").addEventListener("click", function() {
   link.click();
   URL.revokeObjectURL(url);
   
+  // Reset button state
   setTimeout(() => {
     btn.classList.remove('button-active');
     btn.blur();
