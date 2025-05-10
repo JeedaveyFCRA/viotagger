@@ -6,12 +6,35 @@ body {
   color: #222;
 }
 
+/* ========== PAGE + PANEL FULL WHITENING FIX ========== */
+
+html {
+  background-color: #ffffff !important;
+}
+
+.container,
+.left-panel,
+.right-panel,
+.top-panel,
+#image-container {
+  background-color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.left-panel,
+.right-panel {
+  border-left: none !important;
+  border-right: none !important;
+}
+
+
 /* 🔝 Top Panel */
 #top-panel {
   width: 100%;
   padding: 10px 20px;
-  background-color: #f0f0f0;
-  border-bottom: 1px solid #ccc;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #ffffff !important;
 }
 
 .control-panel {
@@ -161,16 +184,6 @@ body {
   cursor: crosshair;
   user-select: none;
   -webkit-user-drag: none;
-}
-
-.left-panel {
-  border-right: 1px solid #ffffff !important;
-  box-shadow: none !important;
-}
-
-.right-panel {
-  border-left: 1px solid #ffffff !important;
-  box-shadow: none !important;
 }
 
 #report-img {
