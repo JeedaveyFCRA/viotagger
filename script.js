@@ -23,6 +23,7 @@ const statusBox = document.getElementById("status-message");
 loadAllProgress();
 
 // ========== IMAGE DRAWING ==========
+// Draw boxes and update tag log live
 imageContainer.addEventListener("mousedown", (e) => {
   e.preventDefault();
   if (e.target.classList.contains("resize-handle")) return;
@@ -56,6 +57,16 @@ imageContainer.addEventListener("mousemove", (e) => {
   currentBox.style.height = `${height}px`;
   currentBox.style.left = `${Math.min(x, startX)}px`;
   currentBox.style.top = `${Math.min(y, startY)}px`;
+
+  // Update tag log with new live coordinates and dimensions
+  const logEntry = document.querySelector(".tag-entry.selected");
+  if (logEntry) {
+    const xCoord = Math.round(currentBox.offsetLeft);
+    const yCoord = Math.round(currentBox.offsetTop);
+    const width = Math.round(currentBox.offsetWidth);
+    const height = Math.round(currentBox.offsetHeight);
+    logEntry.querySelector(".tag-position").textContent = `(${xCoord}, ${yCoord}) | ${width}×${height}`;
+  }
 });
 
 imageContainer.addEventListener("mouseup", (e) => {
@@ -68,9 +79,10 @@ imageContainer.addEventListener("mouseup", (e) => {
     return;
   }
 
-makeBoxInteractive(currentBox, tagData);  // ✅ Add this
+  makeBoxInteractive(currentBox, tagData);  // ✅ Add this
   showPopup(e.clientX, e.clientY);
 });
+
 
 // ========== POPUP TAGGING ==========
 saveTagBtn.addEventListener("click", () => {

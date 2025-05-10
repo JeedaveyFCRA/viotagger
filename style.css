@@ -180,6 +180,19 @@ html {
   color: #999;
 }
 
+/* Style for selected tags to highlight them */
+.tag-entry.selected {
+  background-color: #e3f2fd;
+}
+
+/* Style for updating live coordinates and dimensions */
+.tag-entry .tag-position {
+  font-size: 12px;      /* Update to make it a bit more visible */
+  font-weight: bold;
+  color: #333;          /* Set it to a darker color for readability */
+}
+
+
 /* 🎯 Center Panel */
 #image-viewer {
   width: 810px;
