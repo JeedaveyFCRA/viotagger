@@ -96,11 +96,20 @@ body {
 .hint-label {
   font-weight: bold;
   margin-bottom: 2px;
+  color: #ffffff;
 }
 
 .hint-codes {
-  font-size: 11px;
-  color: #666;
+  font-size: 10px;
+  color: #ffffff !important;  /* force white, override older gray */
+  font-weight: 500;
+}
+
+.hint-action {
+  font-size: 12px;
+  opacity: 0.95;
+  margin-top: 4px;
+  color: #ffffff;
 }
 
 /* 📋 Tag Log */
