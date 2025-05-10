@@ -52,50 +52,53 @@
     <label><input type="radio" name="bureau" value="TransUnion" id="transunionRadio"> TransUnion</label>
 
     <!-- 🏦 Creditor Selection (2-letter visible labels, 4-column grid) -->
-<div id="creditorRadioGroup" class="creditor-grid-4col">
-  <div class="creditor-column">
-    <label><input type="radio" name="creditor" value="AL"> AL</label>
-    <label><input type="radio" name="creditor" value="BB"> BB</label>
-    <label><input type="radio" name="creditor" value="BK"> BK</label>
-    <label><input type="radio" name="creditor" value="BY"> BY</label>
-  </div>
-  <div class="creditor-column">
-    <label><input type="radio" name="creditor" value="C1"> C1</label>
-    <label><input type="radio" name="creditor" value="C2"> C2</label>
-    <label><input type="radio" name="creditor" value="CR"> CR</label>
-  </div>
-  <div class="creditor-column">
-    <label><input type="radio" name="creditor" value="DB"> DB</label>
-    <label><input type="radio" name="creditor" value="DL"> DL</label>
-    <label><input type="radio" name="creditor" value="HD"> HD</label>
-  </div>
-  <div class="creditor-column">
-    <label><input type="radio" name="creditor" value="JP"> JP</label>
-    <label><input type="radio" name="creditor" value="MF"> MF</label>
-    <label><input type="radio" name="creditor" value="SR"> SR</label>
+    <div id="creditorRadioGroup" class="creditor-grid-4col">
+      <div class="creditor-column">
+        <label><input type="radio" name="creditor" value="AL"> AL</label>
+        <label><input type="radio" name="creditor" value="BB"> BB</label>
+        <label><input type="radio" name="creditor" value="BK"> BK</label>
+        <label><input type="radio" name="creditor" value="BY"> BY</label>
+      </div>
+      <div class="creditor-column">
+        <label><input type="radio" name="creditor" value="C1"> C1</label>
+        <label><input type="radio" name="creditor" value="C2"> C2</label>
+        <label><input type="radio" name="creditor" value="CR"> CR</label>
+      </div>
+      <div class="creditor-column">
+        <label><input type="radio" name="creditor" value="DB"> DB</label>
+        <label><input type="radio" name="creditor" value="DL"> DL</label>
+        <label><input type="radio" name="creditor" value="HD"> HD</label>
+      </div>
+      <div class="creditor-column">
+        <label><input type="radio" name="creditor" value="JP"> JP</label>
+        <label><input type="radio" name="creditor" value="MF"> MF</label>
+        <label><input type="radio" name="creditor" value="SR"> SR</label>
+      </div>
+    </div>
+
+    <!-- 📅 Date Selection -->
+    <div id="dateGroup" class="date-button-group" style="display: none;">
+      <div id="dateLabel" style="margin-bottom: 8px; font-weight: bold;">Date + Page:</div>
+      <div id="dateButtons" class="date-grid"></div>
+    </div>
+
+    <!-- 📷 Load Image Button -->
+    <button id="loadRemoteImage">📷 Load PNG</button>
   </div>
 </div>
 
-
-   <!-- 📅 Date Selection -->
-<div id="dateGroup" class="date-button-group" style="display: none;">
-  <div id="dateLabel" style="margin-bottom: 8px; font-weight: bold;">Date + Page:</div>
-  <div id="dateButtons" class="date-grid"></div>
+<!-- 🔽 Popup Dropdown for Tagging -->
+<div id="popup">
+  <select id="violationPreset">
+    <option disabled selected>Select a violation</option>
+  </select>
+  <button id="saveTag">✅ Save Tag</button>
+  <button id="cancelTag">❌ Cancel</button>
 </div>
 
-
-  <!-- 🔽 Popup Dropdown for Tagging -->
-  <div id="popup">
-    <select id="violationPreset">
-      <option disabled selected>Select a violation</option>
-    </select>
-    <button id="saveTag">✅ Save Tag</button>
-    <button id="cancelTag">❌ Cancel</button>
-  </div>
-
-  <script src="hintLookup.js"></script>
-  <script src="imageMap.js"></script>
-  <script src="script.js"></script>
+<script src="hintLookup.js"></script>
+<script src="imageMap.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>

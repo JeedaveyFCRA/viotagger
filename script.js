@@ -211,40 +211,45 @@ document.querySelectorAll('input[name="bureau"]').forEach(radio => {
   });
 });
 
-// When a creditor is selected, show available dates as buttons
+// When a creditor is selected, update the date/page buttons
 document.querySelectorAll('input[name="creditor"]').forEach(radio => {
   radio.addEventListener("change", () => {
     const bureau = getSelectedBureau();
     const creditor = radio.value;
 
-    // Clear any previous buttons
+    const dateGroup = document.getElementById("dateGroup");
+    const dateButtons = document.getElementById("dateButtons");
+
+    // Clear the button area
     dateButtons.innerHTML = "";
     dateGroup.style.display = "none";
 
     // Populate date buttons if available
-if (imageMap[bureau] && imageMap[bureau][creditor]) {
-  const fullNames = imageMap[bureau][creditor];
-  if (fullNames.length > 0) {
-    fullNames.forEach(fullImageName => {
-      const dateMatch = fullImageName.match(/\d{4}-\d{2}-\d{2}/); // extract date
-      const displayLabel = dateMatch ? dateMatch[0] : fullImageName;
+    if (imageMap[bureau] && imageMap[bureau][creditor]) {
+      const fullNames = imageMap[bureau][creditor];
+      if (fullNames.length > 0) {
+        fullNames.forEach(fullImageName => {
+          const dateMatch = fullImageName.match(/\d{4}-\d{2}-\d{2}/);
+          const displayLabel = dateMatch
+            ? `${dateMatch[0]} (${fullImageName.split('-').pop().replace('.png', '')})`
+            : fullImageName;
 
-      const btn = document.createElement("button");
-      btn.className = "date-button";
-      btn.textContent = displayLabel;
-      btn.addEventListener("click", () => {
-        loadRemoteImage(fullImageName, bureau);
-      });
-      dateButtons.appendChild(btn);
-    });
-    dateGroup.style.display = "block";
-  }
-}
+          const btn = document.createElement("button");
+          btn.className = "date-button";
+          btn.textContent = displayLabel;
+          btn.addEventListener("click", () => {
+            loadRemoteImage(fullImageName, bureau);
+          });
+          dateButtons.appendChild(btn);
+        });
+        dateGroup.style.display = "block";
+      }
+    }
+  });
+});
 
 
 
-
-// Loads image from a full filename like "AL-EQ-2024-04-25-P57.png"
 function loadRemoteImage(fullImageName, bureau) {
   imageName = fullImageName;
   const imagePath = `/assets/images/${bureau}/${fullImageName}`;
