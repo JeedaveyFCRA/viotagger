@@ -289,25 +289,25 @@ input[type="radio"] {
 
 
 
-/* 🔁 NEW 3-COLUMN CREDITOR GRID */
-.creditor-grid-3col {
+/* 🔲 Compact 4-Column Creditor Button Layout */
+.creditor-grid-4col {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  gap: 16px; /* tighter spacing */
+  margin-top: 18px;
+  gap: 12px;
+  max-width: 400px;
 }
 
-.creditor-column {
-  width: 32%;
+.creditor-grid-4col .creditor-column {
+  width: 22%;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
-.creditor-column label {
-  font-size: 14px;
-  line-height: 1.3;
+.creditor-grid-4col input[type="radio"] {
+  margin-right: 6px;
 }
 
 
