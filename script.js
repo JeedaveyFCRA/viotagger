@@ -21,43 +21,6 @@ const statusBox = document.getElementById("status-message");
 
 
 
-// ========== IMAGE LOADING ==========
-
-document.getElementById("loadRemoteImage").addEventListener("click", () => {
-  const bureau = bureauSelect.value;
-  const creditor = creditorSelect.value;
-  const datePage = dateSelect.value;
-
-  if (!bureau || !creditor || !datePage) {
-    alert("Please select Bureau, Creditor, and Date/Page.");
-    return;
-  }
-
-  const bureauCode = bureau === "Equifax" ? "EQ" : bureau === "Experian" ? "EX" : "TU";
-  imageName = `${creditor}-${bureauCode}-${datePage}.png`;
-
-  const imagePath = `/assets/images/${bureau}/${imageName}`;
-  reportImg.src = imagePath;
-
-  reportImg.onload = () => {
-    clearCanvas();
-    popup.style.display = "none";
-    clearSelection();
-    tagData = allImageData[imageName] || [];
-    renderTags();
-    updateTagLog();
-    populateDropdown();
-    renderHints();
-    showStatus(`✅ Loaded image: ${imageName}`, 3000);
-  };
-
-  reportImg.onerror = () => {
-    showStatus("❌ Image failed to load: " + imagePath, 4000);
-  };
-});
-
-
-
 
 // ========== INITIAL LOAD ==========
 loadAllProgress();
@@ -203,10 +166,11 @@ function showStatus(msg, duration = 3000) {
 
 
 
-// ========== RADIO BUTTON LOGIC ==========
+// ========== RADIO BUTTON LOGIC (REVISED WITH DATE BUTTONS) ==========
 
 const creditorRadioGroup = document.getElementById("creditorRadioGroup");
-const dateSelect = document.getElementById("dateSelect");
+const dateGroup = document.getElementById("dateGroup");
+const dateButtons = document.getElementById("dateButtons");
 
 // Disable all creditor radios on load
 document.querySelectorAll('input[name="creditor"]').forEach(r => r.disabled = true);
@@ -241,37 +205,71 @@ document.querySelectorAll('input[name="bureau"]').forEach(radio => {
     const checkedCreditor = document.querySelector('input[name="creditor"]:checked');
     if (checkedCreditor) checkedCreditor.checked = false;
 
-    // Clear and disable the Date/Page dropdown
-    dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
-    dateSelect.disabled = true;
+    // Clear date group
+    dateButtons.innerHTML = "";
+    dateGroup.style.display = "none";
   });
 });
 
-// When a creditor is selected, update the date/page dropdown
+// When a creditor is selected, show available dates as buttons
 document.querySelectorAll('input[name="creditor"]').forEach(radio => {
   radio.addEventListener("change", () => {
     const bureau = getSelectedBureau();
     const creditor = radio.value;
 
-    // Clear the dropdown
-    dateSelect.innerHTML = '<option disabled selected>Select Date/Page</option>';
-    dateSelect.disabled = true;
+    // Clear any previous buttons
+    dateButtons.innerHTML = "";
+    dateGroup.style.display = "none";
 
-    // If matching entries exist in imageMap, populate
-    if (imageMap[bureau] && imageMap[bureau][creditor]) {
-      const pages = imageMap[bureau][creditor];
-      if (pages.length > 0) {
-        pages.forEach((datePage) => {
-          const option = document.createElement("option");
-          option.value = datePage;
-          option.textContent = datePage;
-          dateSelect.appendChild(option);
-        });
-        dateSelect.disabled = false;
-      }
-    }
-  });
-});
+    // Populate date buttons if available
+if (imageMap[bureau] && imageMap[bureau][creditor]) {
+  const fullNames = imageMap[bureau][creditor];
+  if (fullNames.length > 0) {
+    fullNames.forEach(fullImageName => {
+      const dateMatch = fullImageName.match(/\d{4}-\d{2}-\d{2}/); // extract date
+      const displayLabel = dateMatch ? dateMatch[0] : fullImageName;
+
+      const btn = document.createElement("button");
+      btn.className = "date-button";
+      btn.textContent = displayLabel;
+      btn.addEventListener("click", () => {
+        loadRemoteImage(fullImageName, bureau);
+      });
+      dateButtons.appendChild(btn);
+    });
+    dateGroup.style.display = "block";
+  }
+}
+
+
+
+
+// Loads image from a full filename like "AL-EQ-2024-04-25-P57.png"
+function loadRemoteImage(fullImageName, bureau) {
+  imageName = fullImageName;
+  const imagePath = `/assets/images/${bureau}/${fullImageName}`;
+  reportImg.src = imagePath;
+
+  reportImg.onload = () => {
+    clearCanvas();
+    popup.style.display = "none";
+    clearSelection();
+    tagData = allImageData[imageName] || [];
+    renderTags();
+    updateTagLog();
+    populateDropdown();
+    renderHints();
+    showStatus(`✅ Loaded image: ${imageName}`, 3000);
+  };
+
+  reportImg.onerror = () => {
+    showStatus("❌ Image failed to load: " + imagePath, 4000);
+  };
+}
+
+
+
+
 
 // ========== HINTS + POPUP ==========
 
@@ -318,41 +316,6 @@ function showPopup(x, y) {
   popup.style.display = "block";
   populateDropdown();
 }
-
-// ========== IMAGE LOADING ==========
-
-document.getElementById("loadRemoteImage").addEventListener("click", () => {
-  const bureau = getSelectedBureau();
-  const creditor = getSelectedCreditor();
-  const datePage = dateSelect.value;
-
-  if (!bureau || !creditor || !datePage) {
-    alert("Please select Bureau, Creditor, and Date/Page.");
-    return;
-  }
-
-  const bureauCode = bureau === "Equifax" ? "EQ" : bureau === "Experian" ? "EX" : "TU";
-  imageName = `${creditor}-${bureauCode}-${datePage}.png`;
-
-  const imagePath = `/assets/images/${bureau}/${imageName}`;
-  reportImg.src = imagePath;
-
-  reportImg.onload = () => {
-    clearCanvas();
-    popup.style.display = "none";
-    clearSelection();
-    tagData = allImageData[imageName] || [];
-    renderTags();
-    updateTagLog();
-    populateDropdown();
-    renderHints();
-    showStatus(`✅ Loaded image: ${imageName}`, 3000);
-  };
-
-  reportImg.onerror = () => {
-    showStatus("❌ Image failed to load: " + imagePath, 4000);
-  };
-});
 
 
 
