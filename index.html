@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <!-- 🔝 Top Panel -->
   <div id="top-panel">
-   <div id="top-title">Violation Tagging Tool</div>
+    <div id="top-title">Violation Tagging Tool</div>
     <div class="control-panel">
       <label for="loadImage" class="button">📁 Load Image</label>
       <input type="file" id="loadImage" accept=".png,.jpg,.jpeg" style="display:none" />
@@ -21,159 +22,134 @@
       <button id="saveProgress" class="button">💾 Save Progress</button>
       <button id="syncAirtable" class="button">📡 Sync to Airtable</button>
 
-<select id="modeSelector" class="button" style="width:auto; padding:6px 10px; height:34px;">
-  <option value="sample">🧪 Sample Mode</option>
-  <option value="final">✅ Final Mode</option>
-</select>
-
-
-
-
+      <select id="modeSelector" class="button" style="width:auto; padding:6px 10px; height:34px;">
+        <option value="sample">🧪 Sample Mode</option>
+        <option value="final">✅ Final Mode</option>
+      </select>
     </div>
-    <div id="status-message"></div>
   </div>
 
-  <!-- ⬇ Main Wrapper: Left + Center + Right -->
+  <!-- ✅ Status Message Box -->
+  <div id="status-message" style="display:none; position:fixed; top:20px; right:20px; z-index:999; background:#222; color:#fff; padding:8px 14px; border-radius:8px; font-size:14px; box-shadow:0 2px 10px rgba(0,0,0,0.25);"></div>
+
+  <!-- ⬇ Main Wrapper -->
   <div id="main-wrapper">
-    <!-- 🧠 Left Panel: Hints + Log -->
+
+    <!-- 🧠 Left Panel -->
     <div id="left-panel">
-      <div id="sidebar-hints">
-        <!-- What to Look For (EQ) -->
-      </div>
-      <div id="tag-log">
-        <!-- Saved tag summaries -->
-      </div>
+      <div id="sidebar-hints"></div>
+      <div id="tag-log"></div>
     </div>
 
-    <!-- 🎯 Center Panel: Image Canvas -->
+    <!-- 🎯 Image Viewer -->
     <div id="image-viewer">
       <div id="image-container">
         <img id="report-img" src="" alt="Credit Report Page" />
-        <!-- Drawn boxes go here -->
       </div>
     </div>
 
-<!-- 📋 Right Panel: Radio Buttons for Bureau and Creditor -->
-<div id="right-panel">
-  <div id="selector-panel">
-    <!-- 📌 Bureau Selection (Radio Buttons) -->
-    <label><input type="radio" name="bureau" value="Equifax" id="equifaxRadio"> Equifax</label>
-    <label><input type="radio" name="bureau" value="Experian" id="experianRadio"> Experian</label>
-    <label><input type="radio" name="bureau" value="TransUnion" id="transunionRadio"> TransUnion</label>
+    <!-- 📋 Right Panel -->
+    <div id="right-panel">
+      <div id="selector-panel">
+        <!-- Bureau Selection -->
+        <label><input type="radio" name="bureau" value="Equifax"> Equifax</label>
+        <label><input type="radio" name="bureau" value="Experian"> Experian</label>
+        <label><input type="radio" name="bureau" value="TransUnion"> TransUnion</label>
 
-    <!-- 🏦 Creditor Selection (2-letter visible labels, 4-column grid) -->
-    <div id="creditorRadioGroup" class="creditor-grid-4col">
-      <div class="creditor-column">
-        <label><input type="radio" name="creditor" value="AL"> AL</label>
-        <label><input type="radio" name="creditor" value="BB"> BB</label>
-        <label><input type="radio" name="creditor" value="BK"> BK</label>
-        <label><input type="radio" name="creditor" value="BY"> BY</label>
-      </div>
-      <div class="creditor-column">
-        <label><input type="radio" name="creditor" value="C1"> C1</label>
-        <label><input type="radio" name="creditor" value="C2"> C2</label>
-        <label><input type="radio" name="creditor" value="CR"> CR</label>
-      </div>
-      <div class="creditor-column">
-        <label><input type="radio" name="creditor" value="DB"> DB</label>
-        <label><input type="radio" name="creditor" value="DL"> DL</label>
-        <label><input type="radio" name="creditor" value="HD"> HD</label>
-      </div>
-      <div class="creditor-column">
-        <label><input type="radio" name="creditor" value="JP"> JP</label>
-        <label><input type="radio" name="creditor" value="MF"> MF</label>
-        <label><input type="radio" name="creditor" value="SR"> SR</label>
-      </div>
-    </div>
+        <!-- Creditor Selection -->
+        <div id="creditorRadioGroup" class="creditor-grid-4col">
+          <div class="creditor-column">
+            <label><input type="radio" name="creditor" value="AL"> AL</label>
+            <label><input type="radio" name="creditor" value="BB"> BB</label>
+            <label><input type="radio" name="creditor" value="BK"> BK</label>
+            <label><input type="radio" name="creditor" value="BY"> BY</label>
+          </div>
+          <div class="creditor-column">
+            <label><input type="radio" name="creditor" value="C1"> C1</label>
+            <label><input type="radio" name="creditor" value="C2"> C2</label>
+            <label><input type="radio" name="creditor" value="CR"> CR</label>
+          </div>
+          <div class="creditor-column">
+            <label><input type="radio" name="creditor" value="DB"> DB</label>
+            <label><input type="radio" name="creditor" value="DL"> DL</label>
+            <label><input type="radio" name="creditor" value="HD"> HD</label>
+          </div>
+          <div class="creditor-column">
+            <label><input type="radio" name="creditor" value="JP"> JP</label>
+            <label><input type="radio" name="creditor" value="MF"> MF</label>
+            <label><input type="radio" name="creditor" value="SR"> SR</label>
+          </div>
+        </div>
 
-    <!-- 📅 Date Selection -->
-    <div id="dateGroup" class="date-button-group" style="display: none;">
-      <div id="dateLabel" style="margin-bottom: 8px; font-weight: bold;">Date + Page:</div>
-      <div id="dateButtons" class="date-grid"></div>
-    </div>
+        <!-- 📅 Date Buttons -->
+        <div id="dateGroup" class="date-button-group" style="display: none;">
+          <div id="dateLabel" style="margin-bottom: 8px; font-weight: bold;">Date + Page:</div>
+          <div id="dateButtons" class="date-grid"></div>
+        </div>
 
-<!-- 🔽 Popup Dropdown for Tagging -->
-<div id="popup">
-  <select id="violationPreset">
-    <option disabled selected>Select a violation</option>
-  </select>
+        <!-- 🔽 Tagging Popup -->
+        <div id="popup">
+          <select id="violationPreset">
+            <option disabled selected>Select a violation</option>
+          </select>
+          <label style="display: block; font-size: 13px; margin-top: 6px;">
+            <input type="checkbox" id="sofCheckbox" /> Mark as SOF (Sign-Off)
+          </label>
+          <button id="saveTag">✅ Save Tag</button>
+          <button id="cancelTag">❌ Cancel</button>
+        </div>
 
-  <label style="display: block; font-size: 13px; margin-top: 6px;">
-    <input type="checkbox" id="sofCheckbox" />
-    Mark as SOF (Sign-Off)
-  </label>
+        <!-- ✏️ Edit Box Modal -->
+        <div id="editBoxModal" class="modal">
+          <div class="modal-content">
+            <h3>Edit Box Dimensions</h3>
+            <div class="form-group"><label>X:</label><input type="number" id="editBoxX" class="coord-input"></div>
+            <div class="form-group"><label>Y:</label><input type="number" id="editBoxY" class="coord-input"></div>
+            <div class="form-group"><label>Width:</label><input type="number" id="editBoxW" class="coord-input"></div>
+            <div class="form-group"><label>Height:</label><input type="number" id="editBoxH" class="coord-input"></div>
+            <div class="modal-actions">
+              <button id="editBoxCancel" class="button">Cancel</button>
+              <button id="editBoxConfirm" class="button button-primary">OK</button>
+            </div>
+          </div>
+        </div>
 
-  <button id="saveTag">✅ Save Tag</button>
-  <button id="cancelTag">❌ Cancel</button>
-</div>
+        <!-- 🔍 Preview Modal -->
+        <div id="previewModal" class="modal" style="display: none;">
+          <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+            <h3>Preview Tags Before Export</h3>
+            <p style="font-size: 13px; margin-bottom: 12px;">
+              Below is a preview of all tags currently in memory.<br>
+              Are you sure you want to proceed with export or sync?
+            </p>
+            <table id="previewTable" style="width:100%; font-size: 12px; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Severity</th>
+                  <th>Label</th>
+                  <th>Codes</th>
+                  <th>Mode</th>
+                  <th>SOF</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div class="modal-actions" style="margin-top: 20px; text-align: right;">
+              <button id="previewCancel" class="button">Cancel</button>
+              <button id="previewConfirm" class="button button-primary">Yes, Proceed</button>
+            </div>
+          </div>
+        </div>
 
+      </div> <!-- /#selector-panel -->
+    </div> <!-- /#right-panel -->
+  </div> <!-- /#main-wrapper -->
 
-
-<!-- Add to your HTML (near the existing popup) -->
-<div id="editBoxModal" class="modal">
-  <div class="modal-content">
-    <h3>Edit Box Dimensions</h3>
-    <div class="form-group">
-      <label>X:</label>
-      <input type="number" id="editBoxX" class="coord-input">
-    </div>
-    <div class="form-group">
-      <label>Y:</label>
-      <input type="number" id="editBoxY" class="coord-input">
-    </div>
-    <div class="form-group">
-      <label>Width:</label>
-      <input type="number" id="editBoxW" class="coord-input">
-    </div>
-    <div class="form-group">
-      <label>Height:</label>
-      <input type="number" id="editBoxH" class="coord-input">
-    </div>
-    <div class="modal-actions">
-      <button id="editBoxCancel" class="button">Cancel</button>
-      <button id="editBoxConfirm" class="button button-primary">OK</button>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- 🔍 Export Preview Modal -->
-<div id="previewModal" class="modal">
-  <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
-    <h3>Preview Tags Before Export</h3>
-    <p style="font-size: 13px; margin-bottom: 12px;">
-      Below is a preview of all tags currently in memory.<br>
-      Are you sure you want to proceed with export or sync?
-    </p>
-    <table id="previewTable" style="width:100%; font-size: 12px; border-collapse: collapse;">
-      <thead>
-  <tr>
-    <th style="border-bottom: 1px solid #ccc; text-align: left;">Image</th>
-    <th style="border-bottom: 1px solid #ccc; text-align: left;">Severity</th>
-    <th style="border-bottom: 1px solid #ccc; text-align: left;">Label</th>
-    <th style="border-bottom: 1px solid #ccc; text-align: left;">Codes</th>
-    <th style="border-bottom: 1px solid #ccc; text-align: left;">Mode</th>
-    <th style="border-bottom: 1px solid #ccc; text-align: left;">SOF</th> <!-- ✅ NEW COLUMN -->
-  </tr>
-</thead>
-      <tbody></tbody>
-    </table>
-    <div class="modal-actions" style="margin-top: 20px;">
-      <button id="previewCancel" class="button">Cancel</button>
-      <button id="previewConfirm" class="button button-primary">Yes, Proceed</button>
-    </div>
-  </div>
-</div>
-
-
-<div id="status-message" style="display:none; position:fixed; top:20px; right:20px; z-index:999; background:#222; color:#fff; padding:8px 14px; border-radius:8px; font-size:14px; box-shadow:0 2px 10px rgba(0,0,0,0.25);"></div>
-
-
-<script src="hintLookup.js"></script>
-<script src="imageMap.js"></script>
-<script src="script.js"></script>
-
+  <!-- ✅ Load JS Files -->
+  <script src="hintLookup.js"></script>
+  <script src="imageMap.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
