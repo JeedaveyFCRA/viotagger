@@ -883,21 +883,18 @@ document.getElementById("exportCSV").addEventListener("click", async function() 
     };
 
     // Process all tags with proper escaping
-    const mode = document.getElementById("modeSelector")?.value || "unspecified";
-
-const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
-  return tags.map(tag => [
-    escapeCSV(imgName),
-    escapeCSV(tag.severity),
-    escapeCSV(tag.label),
-    escapeCSV(tag.codes.join("; ")),
-    tag.x,
-    tag.y,
-    tag.width,
-    tag.height,
-    escapeCSV(mode)  // ✅ Add mode here
-  ]);
-});
+    const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
+      return tags.map(tag => [
+        escapeCSV(imgName),
+        escapeCSV(tag.severity),
+        escapeCSV(tag.label),
+        escapeCSV(tag.codes.join("; ")),
+        tag.x,
+        tag.y,
+        tag.width,
+        tag.height
+      ]);
+    });
 
     if (!allTags.length) {
       showStatus("⚠️ No data to export", 3000);
@@ -906,8 +903,8 @@ const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
 
     // Create header row with proper escaping
     const headers = [
-  "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height", "Mode"
-].map(escapeCSV);
+      "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height"
+    ].map(escapeCSV);
 
     // Build CSV content
     const csvContent = [
