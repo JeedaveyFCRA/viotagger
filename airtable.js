@@ -8,7 +8,9 @@ const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE
 
 // 🚀 Sync Function
 async function syncToAirtable(btn) {
+  console.log("🔁 syncToAirtable() started");
   btn.classList.add("button-active");
+
   const mode = document.getElementById("modeSelector")?.value || "unspecified";
   let count = 0;
 
@@ -29,6 +31,8 @@ async function syncToAirtable(btn) {
             SOF: tag.sof === true
           }
         };
+
+        console.log("📡 Syncing tag to Airtable:", record); // ✅ Log per record
 
         const response = await fetch(AIRTABLE_URL, {
           method: "POST",
@@ -54,9 +58,11 @@ async function syncToAirtable(btn) {
     console.error("Airtable sync error:", err);
     showStatus("❌ Airtable sync failed. See console.", 5000);
   } finally {
+    console.log("🔁 Resetting button:", btn?.id); // ✅ Confirm cleanup runs
     resetButtonState(btn);
   }
 }
+
 
 
 // 🖱️ Connect to Top Panel Button

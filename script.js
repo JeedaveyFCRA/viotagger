@@ -249,12 +249,13 @@ function openPreviewModal(callback) {
     tags.forEach(tag => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${imgName}</td>
-        <td>${tag.severity}</td>
-        <td>${tag.label}</td>
-        <td>${tag.codes.join("; ")}</td>
-        <td>${mode}</td>
-      `;
+  <td>${imgName}</td>
+  <td>${tag.severity}</td>
+  <td>${tag.label}</td>
+  <td>${tag.codes.join("; ")}</td>
+  <td>${mode}</td>
+  <td>${tag.sof ? "TRUE" : ""}</td> <!-- ✅ Add this column -->
+`;
       previewTableBody.appendChild(row);
     });
   });
