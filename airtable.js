@@ -15,14 +15,13 @@ async function syncToAirtable(btn) {
     const hasData = Object.values(allImageData).some(tags => tags.length > 0);
     if (!hasData) {
       showStatus("⚠️ No data to sync", 3000);
-      return;
+      throw new Error("No data to sync"); // This will trigger the catch block
     }
 
     const mode = document.getElementById("modeSelector")?.value || "unspecified";
     let count = 0;
     let errors = 0;
 
-    // Show progress
     showStatus("🔄 Starting Airtable sync...", 0);
 
     for (const [image, tags] of Object.entries(allImageData)) {
@@ -59,8 +58,13 @@ async function syncToAirtable(btn) {
             continue;
           }
 
+          const result = await response.json();
+          if (!result.id) {
+            throw new Error("No record ID returned from Airtable");
+          }
+
           count++;
-          showStatus(`🔄 Syncing (${count} sent, ${errors} errors)...`, 0);
+          showStatus(`🔄 Synced ${count} tags...`, 0);
         } catch (err) {
           console.error("Error sending tag:", err);
           errors++;
@@ -69,22 +73,34 @@ async function syncToAirtable(btn) {
     }
 
     if (errors > 0) {
-      showStatus(`⚠️ Sync completed with ${errors} error(s)`, 5000);
-    } else {
-      showStatus(`✅ Successfully synced ${count} tag(s)`, 4000);
+      throw new Error(`Completed with ${errors} errors`);
     }
+
+    showStatus(`✅ Successfully synced ${count} tag(s)`, 4000);
   } catch (err) {
     console.error("Airtable sync error:", err);
-    showStatus("❌ Sync failed. Check console.", 5000);
+    showStatus("❌ Sync failed. See console.", 5000);
+    // Ensure button resets even on error
+    btn.classList.remove("button-active");
+    return false; // Return false to indicate failure
   } finally {
-    resetButtonState(btn);
+    // Always reset button state
+    setTimeout(() => {
+      btn.classList.remove("button-active");
+    }, 1000);
   }
+  return true; // Return true on success
 }
 
-
-
 // 🖱️ Wire to Sync Button with Preview Modal
-document.getElementById("syncAirtable").addEventListener("click", function () {
+document.getElementById("syncAirtable").addEventListener("click", function() {
   const btn = this;
-  openPreviewModal(() => syncToAirtable(btn));
+  btn.classList.add("button-active");
+  
+  openPreviewModal(async () => {
+    const success = await syncToAirtable(btn);
+    if (!success) {
+      btn.classList.remove("button-active");
+    }
+  });
 });
