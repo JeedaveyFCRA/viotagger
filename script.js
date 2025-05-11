@@ -19,15 +19,8 @@ const saveTagBtn = document.getElementById("saveTag");
 const cancelTagBtn = document.getElementById("cancelTag");
 const statusBox = document.getElementById("status-message");
 
-
-
-
 // ========== INITIAL LOAD ==========
 loadAllProgress();
-
-
-
-
 
 // ========== IMAGE DRAWING ==========
 
@@ -65,8 +58,6 @@ imageContainer.addEventListener("mousemove", (e) => {
   currentBox.style.left = `${Math.min(x, startX)}px`;
   currentBox.style.top = `${Math.min(y, startY)}px`;
 
-
-
 // Always update the latest tag log entry (whether selected or not)
 const logEntries = document.querySelectorAll(".tag-entry");
 if (logEntries.length > 0) {
@@ -82,9 +73,6 @@ if (logEntries.length > 0) {
 }
 
 });
-
-
-
 
 imageContainer.addEventListener("mouseup", (e) => {
   if (!isDrawing || !currentBox) return;
@@ -110,10 +98,6 @@ cancelTagBtn.addEventListener("click", () => {
   currentBox = null;
 });
 
-
-
-
-
 saveTagBtn.addEventListener("click", () => {
   const selectedIndex = violationPreset.selectedIndex;
   if (selectedIndex <= 0) return showStatus("⚠️ Please select a violation", 4000);
@@ -133,6 +117,7 @@ saveTagBtn.addEventListener("click", () => {
     y: Math.round(y),
     width: Math.round(currentBox.offsetWidth),
     height: Math.round(currentBox.offsetHeight)
+    sof: document.getElementById("sofCheckbox").checked
   };
 
   tagData.push(tag);
@@ -155,16 +140,6 @@ saveTagBtn.addEventListener("click", () => {
   currentBox = null;
   showStatus("✅ Violation tag added", 3000);
 });
-
-
-
-
-
-
-
-
-
-
 
 
 // ========== BOX EDITING FUNCTIONALITY ==========
@@ -252,18 +227,6 @@ function hideEditModal() {
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', setupBoxEditing);
 
-
-
-
-
-
-
-
-
-
-
-
-
 // ========== PREVIEW MODAL LOGIC ==========
 
 const previewModal = document.getElementById("previewModal");
@@ -308,20 +271,6 @@ previewConfirm.addEventListener("click", () => {
   if (queuedExportFunction) queuedExportFunction();
   previewModal.style.display = "none";
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ========== RADIO BUTTON LOGIC (REVISED WITH DATE BUTTONS) ==========
 
@@ -413,8 +362,6 @@ document.querySelectorAll('input[name="creditor"]').forEach(radio => {
   });
 });
 
-
-
 function loadRemoteImage(fullImageName, bureau) {
   // Ensure .png is only added once
   imageName = fullImageName.endsWith(".png") ? fullImageName : `${fullImageName}.png`;
@@ -438,11 +385,6 @@ function loadRemoteImage(fullImageName, bureau) {
     showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 }
-
-
-
-
-
 
 // ========== HINTS + POPUP ==========
 
@@ -490,24 +432,6 @@ function showPopup(x, y) {
   populateDropdown();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ========== LOCAL STORAGE ==========
 function saveAllProgress() {
   try {
@@ -537,11 +461,6 @@ function clearCanvas() {
 function clearSelection() {
   document.querySelectorAll(".draw-box.selected").forEach(box => box.classList.remove("selected"));
 }
-
-
-
-
-
 
 
 function renderTags() {
@@ -581,14 +500,6 @@ function renderTags() {
     imageContainer.appendChild(box);
   });
 }
-
-
-
-
-
-
-
-
 
 
 function makeBoxInteractive(box, tagArray) {
@@ -780,16 +691,6 @@ function makeBoxInteractive(box, tagArray) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 function updateTagLog() {
   const log = document.getElementById("tag-log");
   log.innerHTML = "";
@@ -802,7 +703,8 @@ function updateTagLog() {
     const severity = tag.severity || "❓";
     const label = tag.label || "(No label)";
     const codes = tag.codes?.join(", ") || "(No codes)";
-    const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.height ?? "?"} [Mode: ${mode}]`;
+    const sofNote = tag.sof ? " [SOF]" : "";
+const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.height ?? "?"} [Mode: ${mode}]${sofNote}`;
     
     div.innerHTML = `
       <div class="tag-label">${severity} <strong>${label}</strong></div>
@@ -812,12 +714,6 @@ function updateTagLog() {
     log.appendChild(div);
   });
 }
-
-
-
-
-
-
 
 
 // ========== TOP PANEL BUTTONS ==========
