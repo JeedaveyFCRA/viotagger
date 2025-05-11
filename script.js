@@ -109,16 +109,16 @@ saveTagBtn.addEventListener("click", () => {
   const x = rect.left - parentRect.left;
   const y = rect.top - parentRect.top;
 
-  const tag = {
-    label: hint.label,
-    codes: hint.covers,
-    severity: hint.severity,
-    x: Math.round(x),
-    y: Math.round(y),
-    width: Math.round(currentBox.offsetWidth),
-    height: Math.round(currentBox.offsetHeight)
-    sof: document.getElementById("sofCheckbox").checked
-  };
+const tag = {
+  label: hint.label,
+  codes: hint.covers,
+  severity: hint.severity,
+  x: Math.round(x),
+  y: Math.round(y),
+  width: Math.round(currentBox.offsetWidth),
+  height: Math.round(currentBox.offsetHeight), // ← ✅ Add comma here
+  sof: document.getElementById("sofCheckbox").checked
+};
 
   tagData.push(tag);
   if (!allImageData[imageName]) allImageData[imageName] = [];
