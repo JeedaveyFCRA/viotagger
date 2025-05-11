@@ -317,34 +317,29 @@ document.querySelectorAll('input[name="bureau"]').forEach(radio => {
   });
 });
 
-// When a creditor is selected, update the date/page buttons
+
+
+
+
 document.querySelectorAll('input[name="creditor"]').forEach(radio => {
   radio.addEventListener("change", () => {
     const bureau = getSelectedBureau();
     const creditor = radio.value;
 
-    // 🧪 DEBUG START
+    // 🧪 DEBUG START (Safe version)
     console.log("Selected bureau:", bureau);
     console.log("Selected creditor:", creditor);
-    console.log("Matching imageMap entry:", imageMap?.[bureau]?.[creditor]);
+    console.log("Matching imageMap entry:", imageMap && imageMap[bureau] && imageMap[bureau][creditor]);
     // 🧪 DEBUG END
 
-
-
-    // Clear the button area
     dateButtons.innerHTML = "";
     dateGroup.style.display = "none";
 
-    // Populate date buttons if available
     if (imageMap[bureau] && imageMap[bureau][creditor]) {
       const fullNames = imageMap[bureau][creditor];
       if (fullNames.length > 0) {
         fullNames.forEach(fullImageName => {
-          const dateMatch = fullImageName.match(/\d{4}-\d{2}-\d{2}/);
-          const displayLabel = dateMatch
-            ? `${dateMatch[0]} (${fullImageName.split('-').pop().replace('.png', '')})`
-            : fullImageName;
-
+          const displayLabel = fullImageName;
           const btn = document.createElement("button");
           btn.className = "date-button";
           btn.textContent = displayLabel;
@@ -354,10 +349,21 @@ document.querySelectorAll('input[name="creditor"]').forEach(radio => {
           dateButtons.appendChild(btn);
         });
         dateGroup.style.display = "block";
+        console.log("✅ Date buttons created:", fullNames.length);
+      } else {
+        console.warn("⚠️ No images found for that creditor");
       }
+    } else {
+      console.warn("❌ imageMap match failed — check key names");
     }
   });
 });
+
+
+
+
+
+
 
 function loadRemoteImage(fullImageName, bureau) {
   // Ensure .png is only added once
