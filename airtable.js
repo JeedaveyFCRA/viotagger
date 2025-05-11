@@ -14,18 +14,19 @@ const mode = document.getElementById("modeSelector")?.value || "unspecified";
     for (const [image, tags] of Object.entries(allImageData)) {
       for (const tag of tags) {
         const record = {
-          fields: {
-            Image: image,
-            Severity: tag.severity,
-            Label: tag.label,
-            Codes: tag.codes.join("; "),
-            X: tag.x,
-            Y: tag.y,
-            Width: tag.width,
-            Height: tag.height
-            Mode: mode
-          }
-        };
+  fields: {
+    Image: image,
+    Severity: tag.severity,
+    Label: tag.label,
+    Codes: tag.codes.join("; "),
+    X: tag.x,
+    Y: tag.y,
+    Width: tag.width,
+    Height: tag.height,
+    Mode: mode,
+    SOF: tag.sof === true // Airtable boolean
+  }
+};
 
         const response = await fetch(AIRTABLE_URL, {
           method: "POST",

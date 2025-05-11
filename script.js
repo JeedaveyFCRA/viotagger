@@ -842,17 +842,17 @@ async function exportCSV() {
 
     const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
       return tags.map(tag => [
-        escapeCSV(imgName),
-        escapeCSV(tag.severity),
-        escapeCSV(tag.label),
-        escapeCSV(tag.codes.join("; ")),
-        tag.x,
-        tag.y,
-        tag.width,
-        tag.height,
-        escapeCSV(mode)
-      ]);
-    });
+  escapeCSV(imgName),
+  escapeCSV(tag.severity),
+  escapeCSV(tag.label),
+  escapeCSV(tag.codes.join("; ")),
+  tag.x,
+  tag.y,
+  tag.width,
+  tag.height,
+  escapeCSV(mode),
+  tag.sof ? "TRUE" : "FALSE"
+]);
 
     if (!allTags.length) {
       showStatus("⚠️ No data to export", 3000);
@@ -861,8 +861,8 @@ async function exportCSV() {
 
     // Create header row with proper escaping
     const headers = [
-      "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height", "Mode"
-    ].map(escapeCSV);
+  "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height", "Mode", "SOF"
+].map(escapeCSV);
 
     // Build CSV content
     const csvContent = [
