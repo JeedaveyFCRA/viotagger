@@ -90,12 +90,19 @@ async function syncToAirtable(btn) {
 }
 
 // Update the event listener
-document.getElementById("syncAirtable").addEventListener("click", function() {
-  const btn = this;
-  openPreviewModal(() => {
-    syncToAirtable(btn).catch(err => {
-      console.error("Sync error:", err);
-      setButtonState(btn, 'error');
+document.addEventListener("DOMContentLoaded", () => {
+  const syncBtn = document.getElementById("syncAirtable");
+  if (syncBtn) {
+    syncBtn.addEventListener("click", function () {
+      const btn = this;
+      openPreviewModal(() => {
+        syncToAirtable(btn).catch(err => {
+          console.error("Sync error:", err);
+          setButtonState(btn, 'error');
+        });
+      });
     });
-  });
+  } else {
+    console.warn("❌ #syncAirtable button not found in DOM.");
+  }
 });
