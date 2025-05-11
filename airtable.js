@@ -7,10 +7,8 @@ const AIRTABLE_TABLE_NAME = 'ExportedViolations';
 const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
 
 // 🚀 Sync Function
-async function syncToAirtable() {
-  const btn = document.getElementById("syncAirtable");
+async function syncToAirtable(btn) {
   btn.classList.add("button-active");
-
   const mode = document.getElementById("modeSelector")?.value || "unspecified";
   let count = 0;
 
@@ -60,7 +58,9 @@ async function syncToAirtable() {
   }
 }
 
+
 // 🖱️ Connect to Top Panel Button
 document.getElementById("syncAirtable").addEventListener("click", function () {
-  openPreviewModal(syncToAirtable);
+  const btn = this;
+  openPreviewModal(() => syncToAirtable(btn));
 });
