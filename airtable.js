@@ -8,25 +8,29 @@ const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE
 
 // 🚀 Sync Function
 async function syncToAirtable() {
-const mode = document.getElementById("modeSelector")?.value || "unspecified";
+  const btn = document.getElementById("syncAirtable");
+  btn.classList.add("button-active");
+
+  const mode = document.getElementById("modeSelector")?.value || "unspecified";
   let count = 0;
+
   try {
     for (const [image, tags] of Object.entries(allImageData)) {
       for (const tag of tags) {
         const record = {
-  fields: {
-    Image: image,
-    Severity: tag.severity,
-    Label: tag.label,
-    Codes: tag.codes.join("; "),
-    X: tag.x,
-    Y: tag.y,
-    Width: tag.width,
-    Height: tag.height,
-    Mode: mode,
-    SOF: tag.sof === true // Airtable boolean
-  }
-};
+          fields: {
+            Image: image,
+            Severity: tag.severity,
+            Label: tag.label,
+            Codes: tag.codes.join("; "),
+            X: tag.x,
+            Y: tag.y,
+            Width: tag.width,
+            Height: tag.height,
+            Mode: mode,
+            SOF: tag.sof === true
+          }
+        };
 
         const response = await fetch(AIRTABLE_URL, {
           method: "POST",
@@ -38,20 +42,25 @@ const mode = document.getElementById("modeSelector")?.value || "unspecified";
         });
 
         if (!response.ok) {
-          console.error("Airtable error", await response.text());
+          console.error("Airtable error:", await response.text());
           showStatus("❌ Airtable sync failed", 5000);
           return;
         }
+
         count++;
       }
     }
 
     showStatus(`✅ Successfully sent ${count} tag(s) to Airtable`, 4000);
   } catch (err) {
-    console.error("Airtable sync error", err);
+    console.error("Airtable sync error:", err);
     showStatus("❌ Airtable sync failed. See console.", 5000);
+  } finally {
+    resetButtonState(btn);
   }
 }
 
 // 🖱️ Connect to Top Panel Button
-document.getElementById("syncAirtable").addEventListener("click", syncToAirtable);
+document.getElementById("syncAirtable").addEventListener("click", function () {
+  openPreviewModal(syncToAirtable);
+});

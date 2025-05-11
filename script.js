@@ -723,6 +723,7 @@ const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.hei
 
 // Helper function to reset button state
 function resetButtonState(btn, delay = 200) {
+  if (!btn) return;
   setTimeout(() => {
     btn.classList.remove('button-active');
     btn.blur();
@@ -893,7 +894,7 @@ async function exportCSV() {
     console.error("Export error:", error);
     showStatus("⚠️ Error exporting CSV", 3000);
   } finally {
-    resetButtonState(btn);
+    resetButtonState(document.getElementById("exportCSV"));
   }
 }
 
