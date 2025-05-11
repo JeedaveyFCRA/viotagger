@@ -442,8 +442,8 @@ input[type="radio"] {
 }
 
 .coord-input {
-  width: 80px;
-  padding: 8px 10px;
+  width: 50px; /* Reduced from 80px */
+  padding: 8px 6px; /* Slightly reduced padding */
   border: 1px solid #d0d0d0;
   border-radius: 4px;
   font-size: 14px;
