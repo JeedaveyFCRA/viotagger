@@ -4,6 +4,112 @@ const AIRTABLE_BASE_ID = 'apppDRYBhN8W65aL5';
 const AIRTABLE_TABLE_NAME = 'ExportedViolations';
 const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
 
+// Helper function to show status messages
+function showStatus(message, duration = 3000) {
+  const statusBox = document.getElementById("status-message");
+  if (!statusBox) return;
+  
+  // Clear any existing timeout
+  if (statusBox._timeoutId) {
+    clearTimeout(statusBox._timeoutId);
+  }
+  
+  // Show message with appropriate styling
+  statusBox.textContent = message;
+  statusBox.style.opacity = "1";
+  
+  // Apply color based on message type
+  if (message.includes("❌") || message.includes("⚠️")) {
+    statusBox.style.backgroundColor = "#f44336"; // Red for errors
+  } else if (message.includes("✅")) {
+    statusBox.style.backgroundColor = "#4caf50"; // Green for success
+  } else {
+    statusBox.style.backgroundColor = "#2196f3"; // Blue for info
+  }
+  
+  // Auto-hide if duration is specified
+  if (duration > 0) {
+    statusBox._timeoutId = setTimeout(() => {
+      statusBox.style.opacity = "0";
+    }, duration);
+  }
+}
+
+// Function to open preview modal with tag data
+function openPreviewModal(callback) {
+  const modal = document.getElementById('previewModal');
+  const confirmButton = document.getElementById('previewConfirm');
+  const cancelButton = document.getElementById('previewCancel');
+  const tableBody = document.querySelector('#previewTable tbody');
+  
+  if (!modal || !tableBody) {
+    console.error("❌ Preview modal elements not found");
+    if (typeof callback === 'function') callback(); // Call callback anyway to proceed
+    return;
+  }
+  
+  // Clear existing rows
+  tableBody.innerHTML = '';
+  
+  // Add rows for each tag
+  try {
+    const mode = document.getElementById("modeSelector")?.value || "unspecified";
+    
+    // Populate table with tag data
+    for (const [image, tags] of Object.entries(allImageData)) {
+      if (!Array.isArray(tags)) continue;
+      
+      for (const tag of tags) {
+        const row = document.createElement('tr');
+        
+        // Create table cells
+        const cells = [
+          image || "unknown",
+          tag.severity || "unspecified",
+          tag.label || "",
+          Array.isArray(tag.codes) ? tag.codes.join("; ") : "",
+          mode
+        ];
+        
+        // Add cells to row
+        cells.forEach(text => {
+          const td = document.createElement('td');
+          td.textContent = text;
+          td.style.padding = '4px';
+          td.style.borderBottom = '1px solid #eee';
+          row.appendChild(td);
+        });
+        
+        tableBody.appendChild(row);
+      }
+    }
+    
+    // Show the modal
+    modal.style.display = 'block';
+    
+    // Setup event handlers
+    const handleConfirm = () => {
+      modal.style.display = 'none';
+      confirmButton.removeEventListener('click', handleConfirm);
+      cancelButton.removeEventListener('click', handleCancel);
+      if (typeof callback === 'function') callback();
+    };
+    
+    const handleCancel = () => {
+      modal.style.display = 'none';
+      confirmButton.removeEventListener('click', handleConfirm);
+      cancelButton.removeEventListener('click', handleCancel);
+    };
+    
+    confirmButton.addEventListener('click', handleConfirm);
+    cancelButton.addEventListener('click', handleCancel);
+    
+  } catch (e) {
+    console.error("❌ Error populating preview modal:", e);
+    if (typeof callback === 'function') callback(); // Call callback anyway to proceed
+  }
+}
+
 // 🚀 Airtable Sync Function
 async function syncToAirtable() {
   const btn = document.getElementById("syncAirtable");
@@ -20,6 +126,7 @@ async function syncToAirtable() {
     // Validate data exists
     if (typeof allImageData !== 'object' || Object.keys(allImageData).length === 0) {
       showStatus("⚠️ No tag data available to sync", 3000);
+      btn.classList.remove('button-active');
       return;
     }
 
@@ -27,6 +134,7 @@ async function syncToAirtable() {
     const tagCount = Object.values(allImageData).reduce((sum, tags) => sum + (Array.isArray(tags) ? tags.length : 0), 0);
     if (tagCount === 0) {
       showStatus("⚠️ No tag boxes found to sync", 3000);
+      btn.classList.remove('button-active');
       return;
     }
 
@@ -37,6 +145,8 @@ async function syncToAirtable() {
         
         // Process all tags
         for (const [image, tags] of Object.entries(allImageData)) {
+          if (!Array.isArray(tags)) continue;
+          
           for (const tag of tags) {
             try {
               const record = {
@@ -99,49 +209,16 @@ async function syncToAirtable() {
       } catch (syncErr) {
         console.error("❌ Sync execution error:", syncErr);
         showStatus("❌ Sync failed - check console for details", 5000);
+      } finally {
+        btn.classList.remove('button-active');
       }
     });
   } catch (prepErr) {
     console.error("❌ Sync preparation error:", prepErr);
     showStatus("❌ Error preparing sync data", 5000);
-  } finally {
-    setTimeout(() => {
-      btn.classList.remove('button-active');
-      btn.blur();
-    }, 200);
+    btn.classList.remove('button-active');
   }
 }
 
 // 🖱️ Bind Button to Sync Handler
 document.getElementById("syncAirtable").addEventListener("click", syncToAirtable);
-
-// Helper function to show status messages
-function showStatus(message, duration = 3000) {
-  const statusBox = document.getElementById("status-message");
-  if (!statusBox) return;
-  
-  // Clear any existing timeout
-  if (statusBox._timeoutId) {
-    clearTimeout(statusBox._timeoutId);
-  }
-  
-  // Show message with appropriate styling
-  statusBox.textContent = message;
-  statusBox.style.opacity = "1";
-  
-  // Apply color based on message type
-  if (message.includes("❌") || message.includes("⚠️")) {
-    statusBox.style.backgroundColor = "#f44336"; // Red for errors
-  } else if (message.includes("✅")) {
-    statusBox.style.backgroundColor = "#4caf50"; // Green for success
-  } else {
-    statusBox.style.backgroundColor = "#2196f3"; // Blue for info
-  }
-  
-  // Auto-hide if duration is specified
-  if (duration > 0) {
-    statusBox._timeoutId = setTimeout(() => {
-      statusBox.style.opacity = "0";
-    }, duration);
-  }
-}
