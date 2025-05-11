@@ -212,10 +212,7 @@ function setupKeyboardShortcuts() {
   });
 }
 
-// Initialize keyboard shortcuts
-document.addEventListener('DOMContentLoaded', () => {
-  setupKeyboardShortcuts();
-});
+// Initialize features moved to central location
 
 
 
@@ -941,6 +938,104 @@ function makeBoxInteractive(box, tagArray) {
     });
   });
 }
+
+
+
+
+
+
+
+
+function setupMultiBoxMovement() {
+  let isDraggingMultiple = false;
+  let startMouseX, startMouseY;
+  let boxStartPositions = [];
+  
+  // Global mousedown handler for multi-box dragging
+  imageContainer.addEventListener("mousedown", (e) => {
+    // Skip if we clicked on a resize handle or if this is already handled by box's event
+    if (e.target.classList.contains("resize-handle") || e.target.classList.contains("draw-box")) {
+      return;
+    }
+    
+    // Clear selection if clicking on the background
+    clearSelection();
+  });
+  
+  // Global handler for starting a multi-box drag
+  document.addEventListener("mousedown", (e) => {
+    // Only handle box drag starts
+    if (!e.target.classList.contains("draw-box")) return;
+    
+    // If we have multiple selected boxes
+    const selectedBoxes = document.querySelectorAll('.draw-box.selected');
+    if (selectedBoxes.length > 1) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      isDraggingMultiple = true;
+      startMouseX = e.clientX;
+      startMouseY = e.clientY;
+      
+      // Store the starting positions of all selected boxes
+      boxStartPositions = [];
+      selectedBoxes.forEach(box => {
+        boxStartPositions.push({
+          box: box,
+          startX: parseInt(box.style.left),
+          startY: parseInt(box.style.top),
+          tagIndex: parseInt(box.dataset.tagIndex)
+        });
+      });
+    }
+  });
+  
+  // Global mousemove handler for multi-box dragging
+  document.addEventListener("mousemove", (e) => {
+    if (!isDraggingMultiple) return;
+    
+    const deltaX = e.clientX - startMouseX;
+    const deltaY = e.clientY - startMouseY;
+    
+    // Move all boxes by the same delta
+    boxStartPositions.forEach(item => {
+      const newX = item.startX + deltaX;
+      const newY = item.startY + deltaY;
+      
+      item.box.style.left = `${newX}px`;
+      item.box.style.top = `${newY}px`;
+      
+      // Update the data model
+      if (item.tagIndex >= 0 && tagData[item.tagIndex]) {
+        tagData[item.tagIndex].x = newX;
+        tagData[item.tagIndex].y = newY;
+      }
+    });
+    
+    // Update the tag log to reflect the new positions
+    updateTagLog();
+  });
+  
+  // Global mouseup handler for multi-box dragging
+  document.addEventListener("mouseup", (e) => {
+    if (isDraggingMultiple) {
+      isDraggingMultiple = false;
+      
+      // Save all changes to storage
+      allImageData[imageName] = tagData;
+      saveAllProgress();
+      
+      // Boxes remain selected until user clicks elsewhere
+    }
+  });
+}
+
+// Initialize the multi-box movement functionality
+document.addEventListener('DOMContentLoaded', () => {
+  setupKeyboardShortcuts();
+  setupMultiBoxMovement();
+});
+
 
 
 
