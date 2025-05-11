@@ -761,21 +761,33 @@ function makeBoxInteractive(box, tagArray) {
   box.setAttribute('tabindex', '0');
   
   // Mouse drag handling
-  box.addEventListener("mousedown", (e) => {
-    if (e.target.classList.contains("resize-handle")) return;
-    e.stopPropagation();
-    isDragging = true;
-    offsetX = e.offsetX;
-    offsetY = e.offsetY;
-    
-    // If shift key is pressed, allow multi-select
-    if (!e.shiftKey) {
-      clearSelection();
-    }
-    
-    box.classList.add("selected");
-    box.focus(); // Focus the box when selected
-  });
+  // Mouse drag handling
+box.addEventListener("mousedown", (e) => {
+  if (e.target.classList.contains("resize-handle")) return;
+  e.stopPropagation();
+  
+  // Check if we're part of a multi-selection
+  const selectedBoxes = document.querySelectorAll('.draw-box.selected');
+  const isPartOfMultiSelection = selectedBoxes.length > 1 && box.classList.contains('selected');
+  
+  // If this is part of multi-selection, let the multi-box handler take over
+  if (isPartOfMultiSelection) {
+    return; // The setupMultiBoxMovement handler will handle this
+  }
+  
+  // Otherwise, handle as a single box drag
+  isDragging = true;
+  offsetX = e.offsetX;
+  offsetY = e.offsetY;
+  
+  // If shift key is pressed, allow multi-select
+  if (!e.shiftKey) {
+    clearSelection();
+  }
+  
+  box.classList.add("selected");
+  box.focus(); // Focus the box when selected
+});
 
   // Keyboard arrow key movement
   box.addEventListener("keydown", (e) => {
@@ -953,13 +965,13 @@ function setupMultiBoxMovement() {
   
   // Global mousedown handler for multi-box dragging
   imageContainer.addEventListener("mousedown", (e) => {
-    // Skip if we clicked on a resize handle or if this is already handled by box's event
-    if (e.target.classList.contains("resize-handle") || e.target.classList.contains("draw-box")) {
-      return;
-    }
+    // Skip if we clicked on a resize handle
+    if (e.target.classList.contains("resize-handle")) return;
     
-    // Clear selection if clicking on the background
-    clearSelection();
+    // Clear selection if clicking on the background (not on a box)
+    if (!e.target.classList.contains("draw-box")) {
+      clearSelection();
+    }
   });
   
   // Global handler for starting a multi-box drag
@@ -967,9 +979,9 @@ function setupMultiBoxMovement() {
     // Only handle box drag starts
     if (!e.target.classList.contains("draw-box")) return;
     
-    // If we have multiple selected boxes
     const selectedBoxes = document.querySelectorAll('.draw-box.selected');
-    if (selectedBoxes.length > 1) {
+    // If this box is part of a multi-selection
+    if (selectedBoxes.length > 1 && e.target.classList.contains('selected')) {
       e.preventDefault();
       e.stopPropagation();
       
@@ -987,8 +999,11 @@ function setupMultiBoxMovement() {
           tagIndex: parseInt(box.dataset.tagIndex)
         });
       });
+      
+      // Prevent the individual box handler from taking over
+      e.stopImmediatePropagation();
     }
-  });
+  }, true); // Use capture phase to intercept before individual handlers
   
   // Global mousemove handler for multi-box dragging
   document.addEventListener("mousemove", (e) => {
