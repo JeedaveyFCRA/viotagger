@@ -435,6 +435,31 @@ function showPopup(x, y) {
   populateDropdown();
 }
 
+
+
+
+
+function showStatus(message, timeout = 3000) {
+  const statusBox = document.getElementById("status-message");
+  if (!statusBox) return;
+
+  statusBox.textContent = message;
+  statusBox.style.opacity = 1;
+  statusBox.style.display = "block";
+
+  setTimeout(() => {
+    statusBox.style.opacity = 0;
+    setTimeout(() => {
+      statusBox.style.display = "none";
+    }, 400);
+  }, timeout);
+}
+
+
+
+
+
+
 // ========== LOCAL STORAGE ==========
 function saveAllProgress() {
   try {
