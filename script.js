@@ -858,7 +858,8 @@ async function exportCSV() {
   tag.height,
   escapeCSV(mode),
   tag.sof ? "TRUE" : "FALSE"
-]);
+ ]);
+});
 
     if (!allTags.length) {
       showStatus("⚠️ No data to export", 3000);
