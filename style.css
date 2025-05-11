@@ -85,22 +85,15 @@ html {
 
 
 @keyframes buttonSuccess {
-  0% { background-color: rgba(76, 175, 80, 0.1); }
-  50% { background-color: rgba(76, 175, 80, 0.6); }
-  100% { background-color: #4CAF50; }
+  0% { background-color: rgba(46, 125, 50, 0.1); }
+  100% { background-color: #ffffff; }
 }
 
 /* Button success state */
 .button-success {
-  background-color: #4CAF50 !important;
-  color: white !important;
+  animation: buttonSuccess 1s ease-out;
 }
 
-
-.button-error {
-  background-color: #F44336 !important;
-  color: white !important;
-}
 
 #status-message {
   margin-top: 6px;
@@ -109,37 +102,6 @@ html {
   font-size: 12px;
   border-radius: 4px;
   display: none;
-}
-
-
-
-/* Add to style.css */
-.button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.button-processing {
-  position: relative;
-  color: transparent;
-}
-
-.button-processing:after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 16px;
-  height: 16px;
-  margin: -8px 0 0 -8px;
-  border: 2px solid white;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: buttonSpin 0.8s linear infinite;
-}
-
-@keyframes buttonSpin {
-  to { transform: rotate(360deg); }
 }
 
 
