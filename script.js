@@ -374,6 +374,14 @@ document.querySelectorAll('input[name="creditor"]').forEach(radio => {
     const bureau = getSelectedBureau();
     const creditor = radio.value;
 
+    // 🧪 DEBUG START
+    console.log("Selected bureau:", bureau);
+    console.log("Selected creditor:", creditor);
+    console.log("Matching imageMap entry:", imageMap?.[bureau]?.[creditor]);
+    // 🧪 DEBUG END
+
+
+
     const dateGroup = document.getElementById("dateGroup");
     const dateButtons = document.getElementById("dateButtons");
 
