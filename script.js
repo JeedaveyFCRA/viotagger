@@ -227,6 +227,10 @@ function hideEditModal() {
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', setupBoxEditing);
 
+
+
+
+
 // ========== PREVIEW MODAL LOGIC ==========
 
 const previewModal = document.getElementById("previewModal");
@@ -240,38 +244,46 @@ function openPreviewModal(callback) {
   // Store the function to call after confirmation
   queuedExportFunction = callback;
 
-  // Clear old rows
+  // Clear the preview table
   previewTableBody.innerHTML = "";
 
   const mode = document.getElementById("modeSelector")?.value || "unspecified";
 
+  // Build table rows from all current tags
   Object.entries(allImageData).forEach(([imgName, tags]) => {
     tags.forEach(tag => {
       const row = document.createElement("tr");
       row.innerHTML = `
-  <td>${imgName}</td>
-  <td>${tag.severity}</td>
-  <td>${tag.label}</td>
-  <td>${tag.codes.join("; ")}</td>
-  <td>${mode}</td>
-  <td>${tag.sof ? "TRUE" : ""}</td> <!-- ✅ Add this column -->
-`;
+        <td>${imgName}</td>
+        <td>${tag.severity}</td>
+        <td>${tag.label}</td>
+        <td>${tag.codes.join("; ")}</td>
+        <td>${mode}</td>
+        <td>${tag.sof ? "TRUE" : ""}</td>
+      `;
       previewTableBody.appendChild(row);
     });
   });
 
+  // Show the modal
   previewModal.style.display = "block";
 }
 
+// Cancel button closes the modal
 previewCancel.addEventListener("click", () => {
   previewModal.style.display = "none";
   queuedExportFunction = null;
 });
 
+// Confirm button runs the callback and closes the modal
 previewConfirm.addEventListener("click", () => {
   if (queuedExportFunction) queuedExportFunction();
   previewModal.style.display = "none";
 });
+
+
+
+
 
 // ========== RADIO BUTTON LOGIC (REVISED WITH DATE BUTTONS) ==========
 
