@@ -790,17 +790,20 @@ function makeBoxInteractive(box, tagArray) {
 
 
 
-// Rest of the code remains exactly the same...
 function updateTagLog() {
   const log = document.getElementById("tag-log");
   log.innerHTML = "";
+
+  const mode = document.getElementById("modeSelector")?.value || "unspecified";
+
   tagData.forEach(tag => {
     const div = document.createElement("div");
     div.className = "tag-entry";
     const severity = tag.severity || "❓";
     const label = tag.label || "(No label)";
     const codes = tag.codes?.join(", ") || "(No codes)";
-    const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.height ?? "?"}`;
+    const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.height ?? "?"} [Mode: ${mode}]`;
+    
     div.innerHTML = `
       <div class="tag-label">${severity} <strong>${label}</strong></div>
       <div class="tag-codes">${codes}</div>
