@@ -331,9 +331,6 @@ document.querySelectorAll('input[name="creditor"]').forEach(radio => {
 
 
 
-    const dateGroup = document.getElementById("dateGroup");
-    const dateButtons = document.getElementById("dateButtons");
-
     // Clear the button area
     dateButtons.innerHTML = "";
     dateGroup.style.display = "none";
