@@ -4,6 +4,8 @@ const AIRTABLE_BASE_ID = 'apppDRYBhN8W65aL5';
 const AIRTABLE_TABLE_NAME = 'ExportedViolations';
 
 
+
+
 // 🚀 Sync Function
 async function syncToAirtable() {
   const btn = document.getElementById("syncAirtable");
