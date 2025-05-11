@@ -55,6 +55,11 @@ function openPreviewModal(callback) {
   try {
     const mode = document.getElementById("modeSelector")?.value || "unspecified";
     
+    // Standardize mode value to match Airtable's expected values
+    const normalizedMode = mode.toLowerCase() === "final mode" ? "final" : 
+                           mode.toLowerCase() === "sample mode" ? "sample" : 
+                           "sample"; // Default to sample as fallback
+    
     // Populate table with tag data
     for (const [image, tags] of Object.entries(allImageData)) {
       if (!Array.isArray(tags)) continue;
@@ -68,7 +73,7 @@ function openPreviewModal(callback) {
           tag.severity || "unspecified",
           tag.label || "",
           Array.isArray(tag.codes) ? tag.codes.join("; ") : "",
-          mode
+          normalizedMode
         ];
         
         // Add cells to row
@@ -118,7 +123,16 @@ async function syncToAirtable() {
   // Show initial status
   showStatus("⏳ Starting Airtable sync...", 2000);
 
-  const mode = document.getElementById("modeSelector")?.value || "unspecified";
+  // Get mode and normalize it to match Airtable's options
+  const modeElement = document.getElementById("modeSelector");
+  const modeValue = modeElement?.value || "unspecified";
+  
+  // Normalize mode to one of the allowed values in Airtable
+  // This is critical - using exact strings that match your Airtable's predefined options
+  const mode = modeValue.toLowerCase().includes("final") ? "final" :
+               modeValue.toLowerCase().includes("sample") ? "sample" : 
+               "sample"; // Default to sample as fallback
+  
   let count = 0;
   let errorCount = 0;
 
@@ -159,7 +173,7 @@ async function syncToAirtable() {
                   Y: typeof tag.y === 'number' ? tag.y : 0,
                   Width: typeof tag.width === 'number' ? tag.width : 0,
                   Height: typeof tag.height === 'number' ? tag.height : 0,
-                  Mode: mode,
+                  Mode: mode, // Using normalized mode value
                   SOF: tag.sof === true
                 }
               };
@@ -180,10 +194,18 @@ async function syncToAirtable() {
               clearTimeout(timeoutId);
 
               if (!response.ok) {
-                const errorText = await response.text();
-                console.error("❌ Airtable sync error:", errorText);
-                errorCount++;
-                continue; // Skip to next record on failure
+                const errorData = await response.json();
+                console.error("❌ Airtable sync error:", errorData);
+                
+                // Check for specific error types and provide better feedback
+                if (errorData?.error?.type === "INVALID_MULTIPLE_CHOICE_OPTIONS") {
+                  showStatus(`❌ Mode "${mode}" not allowed in Airtable - check settings`, 5000);
+                  errorCount++;
+                  return; // Stop further syncing on field validation errors
+                } else {
+                  errorCount++;
+                }
+                continue; // Skip to next record on other failures
               }
 
               count++;
