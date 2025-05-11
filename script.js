@@ -144,7 +144,15 @@ const tag = {
 
 // ========== BOX EDITING FUNCTIONALITY ==========
 
-// Add to your existing script.js
+
+
+
+
+
+
+
+// ========== BOX EDITING FUNCTIONALITY ==========
+
 function setupBoxEditing() {
   // Double-click handler for boxes
   imageContainer.addEventListener('dblclick', (e) => {
@@ -156,45 +164,28 @@ function setupBoxEditing() {
 
   // Modal confirm handler
   document.getElementById('editBoxConfirm').addEventListener('click', () => {
-    const box = document.querySelector('.draw-box.selected');
-    if (!box) return;
-
-    const newX = parseInt(document.getElementById('editBoxX').value);
-    const newY = parseInt(document.getElementById('editBoxY').value);
-    const newW = parseInt(document.getElementById('editBoxW').value);
-    const newH = parseInt(document.getElementById('editBoxH').value);
-
-    if (isNaN(newX) || isNaN(newY) || isNaN(newW) || isNaN(newH)) {
-      showStatus("⚠️ Please enter valid numbers", 3000);
-      return;
-    }
-
-    // Update box position and size
-    box.style.left = `${newX}px`;
-    box.style.top = `${newY}px`;
-    box.style.width = `${newW}px`;
-    box.style.height = `${newH}px`;
-
-    // Update the associated tag data
-    const tagIndex = box.dataset.tagIndex;
-    if (tagIndex !== undefined && tagData[tagIndex]) {
-      tagData[tagIndex].x = newX;
-      tagData[tagIndex].y = newY;
-      tagData[tagIndex].width = newW;
-      tagData[tagIndex].height = newH;
-      
-      // Update storage and UI
-      allImageData[imageName] = tagData;
-      updateTagLog();
-      saveAllProgress();
-    }
-
-    hideEditModal();
-    showStatus("✅ Box updated", 2000);
+    applyBoxEdits();
   });
 
   // Modal cancel handler
   document.getElementById('editBoxCancel').addEventListener('click', hideEditModal);
+  
+  // Add Enter key support
+  document.getElementById('editBoxModal').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      applyBoxEdits();
+    } else if (e.key === 'Escape') {
+      hideEditModal();
+    }
+  });
+  
+  // Optional: Close when clicking outside modal
+  document.getElementById('editBoxModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('editBoxModal')) {
+      hideEditModal();
+    }
+  });
 }
 
 function showEditModal(box) {
@@ -208,21 +199,134 @@ function showEditModal(box) {
   const width = rect.width;
   const height = rect.height;
 
-  // Populate inputs
+  // Populate coordinate inputs
   document.getElementById('editBoxX').value = Math.round(x);
   document.getElementById('editBoxY').value = Math.round(y);
   document.getElementById('editBoxW').value = Math.round(width);
   document.getElementById('editBoxH').value = Math.round(height);
-
+  
+  // Get current tag data
+  const tagIndex = parseInt(box.dataset.tagIndex);
+  const tag = tagData[tagIndex];
+  
+  // Populate violation dropdown
+  populateViolationDropdown(tag);
+  
+  // Set sign-off checkbox
+  document.getElementById('editBoxSignOff').checked = tag.sof === true;
+  
   // Show modal
   modal.style.display = 'block';
   clearSelection();
   box.classList.add('selected');
+  
+  // Focus first field for immediate keyboard entry
+  document.getElementById('editBoxX').focus();
+}
+
+function populateViolationDropdown(tag) {
+  const dropdown = document.getElementById('editBoxViolation');
+  dropdown.innerHTML = '';
+  
+  // Get current bureauCode from imageName
+  const bureauCode = imageName.includes("-EQ-") ? "EQ" : 
+                     imageName.includes("-EX-") ? "EX" : 
+                     imageName.includes("-TU-") ? "TU" : null;
+  
+  if (!bureauCode || !hintLookup[bureauCode]) {
+    // Fallback if no hints available
+    const option = document.createElement('option');
+    option.value = tag.label || '';
+    option.textContent = tag.label || 'Unknown';
+    dropdown.appendChild(option);
+    return;
+  }
+  
+  // Add all options from hintLookup
+  hintLookup[bureauCode].forEach(hint => {
+    const option = document.createElement('option');
+    option.value = hint.label;
+    option.textContent = `${hint.severity} ${hint.label} (${hint.covers.length} code${hint.covers.length > 1 ? 's' : ''})`;
+    
+    // Store additional data as attributes for later retrieval
+    option.dataset.severity = hint.severity;
+    option.dataset.codes = JSON.stringify(hint.covers);
+    
+    dropdown.appendChild(option);
+    
+    // Select the current value
+    if (hint.label === tag.label) {
+      option.selected = true;
+    }
+  });
+}
+
+function applyBoxEdits() {
+  const box = document.querySelector('.draw-box.selected');
+  if (!box) return;
+
+  // Get values from form
+  const newX = parseInt(document.getElementById('editBoxX').value);
+  const newY = parseInt(document.getElementById('editBoxY').value);
+  const newW = parseInt(document.getElementById('editBoxW').value);
+  const newH = parseInt(document.getElementById('editBoxH').value);
+  const newViolation = document.getElementById('editBoxViolation').value;
+  const newSignOff = document.getElementById('editBoxSignOff').checked;
+  
+  // Validate coordinate values
+  if (isNaN(newX) || isNaN(newY) || isNaN(newW) || isNaN(newH)) {
+    showStatus("⚠️ Please enter valid numbers", 3000);
+    return;
+  }
+  
+  // Get selected option to access all violation data
+  const selectedOption = document.getElementById('editBoxViolation').selectedOptions[0];
+  const newSeverity = selectedOption.dataset.severity;
+  const newCodes = JSON.parse(selectedOption.dataset.codes || '[]');
+
+  // Update box position and size
+  box.style.left = `${newX}px`;
+  box.style.top = `${newY}px`;
+  box.style.width = `${newW}px`;
+  box.style.height = `${newH}px`;
+
+  // Update the associated tag data
+  const tagIndex = parseInt(box.dataset.tagIndex);
+  if (tagIndex >= 0 && tagData[tagIndex]) {
+    const tag = tagData[tagIndex];
+    
+    // Update position and size
+    tag.x = newX;
+    tag.y = newY;
+    tag.width = newW;
+    tag.height = newH;
+    
+    // Update violation data
+    tag.label = newViolation;
+    tag.severity = newSeverity;
+    tag.codes = newCodes;
+    tag.sof = newSignOff;
+    
+    // Update storage and UI
+    allImageData[imageName] = tagData;
+    updateTagLog();
+    saveAllProgress();
+  }
+
+  hideEditModal();
+  showStatus("✅ Box updated", 2000);
 }
 
 function hideEditModal() {
   document.getElementById('editBoxModal').style.display = 'none';
 }
+
+
+
+
+
+
+
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', setupBoxEditing);

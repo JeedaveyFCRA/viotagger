@@ -109,26 +109,46 @@
 
 
 
-<!-- Add to your HTML (near the existing popup) -->
+
+<!-- Edit Box Modal (Updated) -->
 <div id="editBoxModal" class="modal">
   <div class="modal-content">
-    <h3>Edit Box Dimensions</h3>
-    <div class="form-group">
-      <label>X:</label>
-      <input type="number" id="editBoxX" class="coord-input">
+    <h3>Edit Violation Box</h3>
+    
+    <!-- Coordinates row -->
+    <div class="coords-row">
+      <div class="form-group compact">
+        <label>X:</label>
+        <input type="number" id="editBoxX" class="coord-input">
+      </div>
+      <div class="form-group compact">
+        <label>Y:</label>
+        <input type="number" id="editBoxY" class="coord-input">
+      </div>
+      <div class="form-group compact">
+        <label>W:</label>
+        <input type="number" id="editBoxW" class="coord-input">
+      </div>
+      <div class="form-group compact">
+        <label>H:</label>
+        <input type="number" id="editBoxH" class="coord-input">
+      </div>
     </div>
+    
+    <!-- Violation dropdown -->
     <div class="form-group">
-      <label>Y:</label>
-      <input type="number" id="editBoxY" class="coord-input">
+      <label>Violation:</label>
+      <select id="editBoxViolation" class="violation-dropdown"></select>
     </div>
-    <div class="form-group">
-      <label>Width:</label>
-      <input type="number" id="editBoxW" class="coord-input">
+    
+    <!-- Sign-off checkbox -->
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" id="editBoxSignOff">
+        Sign-Off
+      </label>
     </div>
-    <div class="form-group">
-      <label>Height:</label>
-      <input type="number" id="editBoxH" class="coord-input">
-    </div>
+    
     <div class="modal-actions">
       <button id="editBoxCancel" class="button">Cancel</button>
       <button id="editBoxConfirm" class="button button-primary">OK</button>
