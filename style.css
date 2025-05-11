@@ -92,17 +92,15 @@ html {
 
 /* Button success state */
 .button-success {
-  animation: buttonSuccess 1s ease-out;
   background-color: #4CAF50 !important;
   color: white !important;
-  border-color: #388E3C !important;
 }
 
 
 .button-error {
   background-color: #F44336 !important;
+  color: white !important;
 }
-
 
 #status-message {
   margin-top: 6px;
@@ -134,7 +132,7 @@ html {
   width: 16px;
   height: 16px;
   margin: -8px 0 0 -8px;
-  border: 2px solid #fff;
+  border: 2px solid white;
   border-top-color: transparent;
   border-radius: 50%;
   animation: buttonSpin 0.8s linear infinite;
