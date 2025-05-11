@@ -19,15 +19,8 @@ const saveTagBtn = document.getElementById("saveTag");
 const cancelTagBtn = document.getElementById("cancelTag");
 const statusBox = document.getElementById("status-message");
 
-
-
-
 // ========== INITIAL LOAD ==========
 loadAllProgress();
-
-
-
-
 
 // ========== IMAGE DRAWING ==========
 
@@ -65,8 +58,6 @@ imageContainer.addEventListener("mousemove", (e) => {
   currentBox.style.left = `${Math.min(x, startX)}px`;
   currentBox.style.top = `${Math.min(y, startY)}px`;
 
-
-
 // Always update the latest tag log entry (whether selected or not)
 const logEntries = document.querySelectorAll(".tag-entry");
 if (logEntries.length > 0) {
@@ -82,9 +73,6 @@ if (logEntries.length > 0) {
 }
 
 });
-
-
-
 
 imageContainer.addEventListener("mouseup", (e) => {
   if (!isDrawing || !currentBox) return;
@@ -110,10 +98,6 @@ cancelTagBtn.addEventListener("click", () => {
   currentBox = null;
 });
 
-
-
-
-
 saveTagBtn.addEventListener("click", () => {
   const selectedIndex = violationPreset.selectedIndex;
   if (selectedIndex <= 0) return showStatus("⚠️ Please select a violation", 4000);
@@ -125,15 +109,16 @@ saveTagBtn.addEventListener("click", () => {
   const x = rect.left - parentRect.left;
   const y = rect.top - parentRect.top;
 
-  const tag = {
-    label: hint.label,
-    codes: hint.covers,
-    severity: hint.severity,
-    x: Math.round(x),
-    y: Math.round(y),
-    width: Math.round(currentBox.offsetWidth),
-    height: Math.round(currentBox.offsetHeight)
-  };
+const tag = {
+  label: hint.label,
+  codes: hint.covers,
+  severity: hint.severity,
+  x: Math.round(x),
+  y: Math.round(y),
+  width: Math.round(currentBox.offsetWidth),
+  height: Math.round(currentBox.offsetHeight), // ← ✅ Add comma here
+  sof: document.getElementById("sofCheckbox").checked
+};
 
   tagData.push(tag);
   if (!allImageData[imageName]) allImageData[imageName] = [];
@@ -155,16 +140,6 @@ saveTagBtn.addEventListener("click", () => {
   currentBox = null;
   showStatus("✅ Violation tag added", 3000);
 });
-
-
-
-
-
-
-
-
-
-
 
 
 // ========== BOX EDITING FUNCTIONALITY ==========
@@ -252,24 +227,50 @@ function hideEditModal() {
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', setupBoxEditing);
 
+// ========== PREVIEW MODAL LOGIC ==========
 
+const previewModal = document.getElementById("previewModal");
+const previewTableBody = document.querySelector("#previewTable tbody");
+const previewCancel = document.getElementById("previewCancel");
+const previewConfirm = document.getElementById("previewConfirm");
 
+let queuedExportFunction = null;
 
+function openPreviewModal(callback) {
+  // Store the function to call after confirmation
+  queuedExportFunction = callback;
 
+  // Clear old rows
+  previewTableBody.innerHTML = "";
 
+  const mode = document.getElementById("modeSelector")?.value || "unspecified";
 
+  Object.entries(allImageData).forEach(([imgName, tags]) => {
+    tags.forEach(tag => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${imgName}</td>
+        <td>${tag.severity}</td>
+        <td>${tag.label}</td>
+        <td>${tag.codes.join("; ")}</td>
+        <td>${mode}</td>
+      `;
+      previewTableBody.appendChild(row);
+    });
+  });
 
+  previewModal.style.display = "block";
+}
 
+previewCancel.addEventListener("click", () => {
+  previewModal.style.display = "none";
+  queuedExportFunction = null;
+});
 
-
-
-
-
-
-
-
-
-
+previewConfirm.addEventListener("click", () => {
+  if (queuedExportFunction) queuedExportFunction();
+  previewModal.style.display = "none";
+});
 
 // ========== RADIO BUTTON LOGIC (REVISED WITH DATE BUTTONS) ==========
 
@@ -316,29 +317,29 @@ document.querySelectorAll('input[name="bureau"]').forEach(radio => {
   });
 });
 
-// When a creditor is selected, update the date/page buttons
+
+
+
+
 document.querySelectorAll('input[name="creditor"]').forEach(radio => {
   radio.addEventListener("change", () => {
     const bureau = getSelectedBureau();
     const creditor = radio.value;
 
-    const dateGroup = document.getElementById("dateGroup");
-    const dateButtons = document.getElementById("dateButtons");
+    // 🧪 DEBUG START (Safe version)
+    console.log("Selected bureau:", bureau);
+    console.log("Selected creditor:", creditor);
+    console.log("Matching imageMap entry:", imageMap && imageMap[bureau] && imageMap[bureau][creditor]);
+    // 🧪 DEBUG END
 
-    // Clear the button area
     dateButtons.innerHTML = "";
     dateGroup.style.display = "none";
 
-    // Populate date buttons if available
     if (imageMap[bureau] && imageMap[bureau][creditor]) {
       const fullNames = imageMap[bureau][creditor];
       if (fullNames.length > 0) {
         fullNames.forEach(fullImageName => {
-          const dateMatch = fullImageName.match(/\d{4}-\d{2}-\d{2}/);
-          const displayLabel = dateMatch
-            ? `${dateMatch[0]} (${fullImageName.split('-').pop().replace('.png', '')})`
-            : fullImageName;
-
+          const displayLabel = fullImageName;
           const btn = document.createElement("button");
           btn.className = "date-button";
           btn.textContent = displayLabel;
@@ -348,10 +349,19 @@ document.querySelectorAll('input[name="creditor"]').forEach(radio => {
           dateButtons.appendChild(btn);
         });
         dateGroup.style.display = "block";
+        console.log("✅ Date buttons created:", fullNames.length);
+      } else {
+        console.warn("⚠️ No images found for that creditor");
       }
+    } else {
+      console.warn("❌ imageMap match failed — check key names");
     }
   });
 });
+
+
+
+
 
 
 
@@ -378,11 +388,6 @@ function loadRemoteImage(fullImageName, bureau) {
     showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 }
-
-
-
-
-
 
 // ========== HINTS + POPUP ==========
 
@@ -430,24 +435,6 @@ function showPopup(x, y) {
   populateDropdown();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ========== LOCAL STORAGE ==========
 function saveAllProgress() {
   try {
@@ -477,11 +464,6 @@ function clearCanvas() {
 function clearSelection() {
   document.querySelectorAll(".draw-box.selected").forEach(box => box.classList.remove("selected"));
 }
-
-
-
-
-
 
 
 function renderTags() {
@@ -521,14 +503,6 @@ function renderTags() {
     imageContainer.appendChild(box);
   });
 }
-
-
-
-
-
-
-
-
 
 
 function makeBoxInteractive(box, tagArray) {
@@ -720,27 +694,21 @@ function makeBoxInteractive(box, tagArray) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-// Rest of the code remains exactly the same...
 function updateTagLog() {
   const log = document.getElementById("tag-log");
   log.innerHTML = "";
+
+  const mode = document.getElementById("modeSelector")?.value || "unspecified";
+
   tagData.forEach(tag => {
     const div = document.createElement("div");
     div.className = "tag-entry";
     const severity = tag.severity || "❓";
     const label = tag.label || "(No label)";
     const codes = tag.codes?.join(", ") || "(No codes)";
-    const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.height ?? "?"}`;
+    const sofNote = tag.sof ? " [SOF]" : "";
+const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.height ?? "?"} [Mode: ${mode}]${sofNote}`;
+    
     div.innerHTML = `
       <div class="tag-label">${severity} <strong>${label}</strong></div>
       <div class="tag-codes">${codes}</div>
@@ -749,12 +717,6 @@ function updateTagLog() {
     log.appendChild(div);
   });
 }
-
-
-
-
-
-
 
 
 // ========== TOP PANEL BUTTONS ==========
@@ -865,17 +827,16 @@ document.getElementById("saveProgress").addEventListener("click", async function
   }
 });
 
-// Export CSV Button
-document.getElementById("exportCSV").addEventListener("click", async function() {
-  const btn = this;
+// ✅ Export CSV function (called after preview confirmation)
+async function exportCSV() {
+  const btn = document.getElementById("exportCSV");
   btn.classList.add('button-active');
-  
+
   try {
     // Robust CSV escaping function
     const escapeCSV = (value) => {
       if (value === null || value === undefined) return '';
       value = String(value);
-      // Escape quotes by doubling them and wrap in quotes if contains special chars
       if (/[",\n]/.test(value)) {
         return `"${value.replace(/"/g, '""')}"`;
       }
@@ -883,18 +844,22 @@ document.getElementById("exportCSV").addEventListener("click", async function() 
     };
 
     // Process all tags with proper escaping
+    const mode = document.getElementById("modeSelector")?.value || "unspecified";
+
     const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
       return tags.map(tag => [
-        escapeCSV(imgName),
-        escapeCSV(tag.severity),
-        escapeCSV(tag.label),
-        escapeCSV(tag.codes.join("; ")),
-        tag.x,
-        tag.y,
-        tag.width,
-        tag.height
-      ]);
-    });
+  escapeCSV(imgName),
+  escapeCSV(tag.severity),
+  escapeCSV(tag.label),
+  escapeCSV(tag.codes.join("; ")),
+  tag.x,
+  tag.y,
+  tag.width,
+  tag.height,
+  escapeCSV(mode),
+  tag.sof ? "TRUE" : "FALSE"
+ ]);
+});
 
     if (!allTags.length) {
       showStatus("⚠️ No data to export", 3000);
@@ -903,8 +868,8 @@ document.getElementById("exportCSV").addEventListener("click", async function() 
 
     // Create header row with proper escaping
     const headers = [
-      "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height"
-    ].map(escapeCSV);
+  "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height", "Mode", "SOF"
+].map(escapeCSV);
 
     // Build CSV content
     const csvContent = [
@@ -922,7 +887,7 @@ document.getElementById("exportCSV").addEventListener("click", async function() 
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    
+
     showStatus("📤 CSV exported", 3000);
   } catch (error) {
     console.error("Export error:", error);
@@ -930,4 +895,9 @@ document.getElementById("exportCSV").addEventListener("click", async function() 
   } finally {
     resetButtonState(btn);
   }
+}
+
+// ✅ CSV Button — now launches preview modal before export
+document.getElementById("exportCSV").addEventListener("click", function () {
+  openPreviewModal(exportCSV);
 });

@@ -20,6 +20,15 @@
       <button id="clearAllData" class="button">🧹 Clear ALL Data</button>
       <button id="saveProgress" class="button">💾 Save Progress</button>
       <button id="syncAirtable" class="button">📡 Sync to Airtable</button>
+
+<select id="modeSelector" class="button" style="width:auto; padding:6px 10px; height:34px;">
+  <option value="sample">🧪 Sample Mode</option>
+  <option value="final">✅ Final Mode</option>
+</select>
+
+
+
+
     </div>
     <div id="status-message"></div>
   </div>
@@ -88,13 +97,15 @@
   <select id="violationPreset">
     <option disabled selected>Select a violation</option>
   </select>
+
+  <label style="display: block; font-size: 13px; margin-top: 6px;">
+    <input type="checkbox" id="sofCheckbox" />
+    Mark as SOF (Sign-Off)
+  </label>
+
   <button id="saveTag">✅ Save Tag</button>
   <button id="cancelTag">❌ Cancel</button>
 </div>
-
-<script src="hintLookup.js"></script>
-<script src="imageMap.js"></script>
-<script src="script.js"></script>
 
 
 
@@ -124,6 +135,40 @@
     </div>
   </div>
 </div>
+
+
+
+<!-- 🔍 Export Preview Modal -->
+<div id="previewModal" class="modal">
+  <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+    <h3>Preview Tags Before Export</h3>
+    <p style="font-size: 13px; margin-bottom: 12px;">
+      Below is a preview of all tags currently in memory.<br>
+      Are you sure you want to proceed with export or sync?
+    </p>
+    <table id="previewTable" style="width:100%; font-size: 12px; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="border-bottom: 1px solid #ccc; text-align: left;">Image</th>
+          <th style="border-bottom: 1px solid #ccc; text-align: left;">Severity</th>
+          <th style="border-bottom: 1px solid #ccc; text-align: left;">Label</th>
+          <th style="border-bottom: 1px solid #ccc; text-align: left;">Codes</th>
+          <th style="border-bottom: 1px solid #ccc; text-align: left;">Mode</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="modal-actions" style="margin-top: 20px;">
+      <button id="previewCancel" class="button">Cancel</button>
+      <button id="previewConfirm" class="button button-primary">Yes, Proceed</button>
+    </div>
+  </div>
+</div>
+
+<script src="hintLookup.js"></script>
+<script src="imageMap.js"></script>
+<script src="script.js"></script>
+
 
 </body>
 </html>

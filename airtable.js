@@ -8,22 +8,25 @@ const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE
 
 // 🚀 Sync Function
 async function syncToAirtable() {
+const mode = document.getElementById("modeSelector")?.value || "unspecified";
   let count = 0;
   try {
     for (const [image, tags] of Object.entries(allImageData)) {
       for (const tag of tags) {
         const record = {
-          fields: {
-            Image: image,
-            Severity: tag.severity,
-            Label: tag.label,
-            Codes: tag.codes.join("; "),
-            X: tag.x,
-            Y: tag.y,
-            Width: tag.width,
-            Height: tag.height
-          }
-        };
+  fields: {
+    Image: image,
+    Severity: tag.severity,
+    Label: tag.label,
+    Codes: tag.codes.join("; "),
+    X: tag.x,
+    Y: tag.y,
+    Width: tag.width,
+    Height: tag.height,
+    Mode: mode,
+    SOF: tag.sof === true // Airtable boolean
+  }
+};
 
         const response = await fetch(AIRTABLE_URL, {
           method: "POST",
