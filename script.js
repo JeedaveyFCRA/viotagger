@@ -851,192 +851,114 @@ function resetButtonState(btn, delay = 200) {
 
 
 
-document.getElementById("toggleMultiSelect").addEventListener("click", function() {
-  isMultiSelectMode = !isMultiSelectMode;
-  this.textContent = isMultiSelectMode ? "🔘 Multi: ON" : "🔘 Multi: OFF";
-  this.classList.toggle('button-active', isMultiSelectMode);
-  showStatus(isMultiSelectMode ? "Multi-select mode ON" : "Multi-select mode OFF", 2000);
-  
-  // Reset after brief period if not toggled on
-  if (!isMultiSelectMode) {
-    setTimeout(() => {
-      this.classList.remove('button-active');
-    }, 300);
-  }
-});
+document.addEventListener("DOMContentLoaded", function () {
+  // Toggle Multi-Select
+  document.getElementById("toggleMultiSelect").addEventListener("click", function () {
+    isMultiSelectMode = !isMultiSelectMode;
+    this.textContent = isMultiSelectMode ? "🔘 Multi: ON" : "🔘 Multi: OFF";
+    this.classList.toggle('button-active', isMultiSelectMode);
+    showStatus(isMultiSelectMode ? "Multi-select mode ON" : "Multi-select mode OFF", 2000);
 
-
-
-
-// Delete Selected Button
-document.getElementById("deleteSelected").addEventListener("click", async function() {
-  const btn = this;
-  btn.classList.add('button-active');
-  
-  try {
-    const selectedBox = imageContainer.querySelector(".draw-box.selected");
-    if (!selectedBox) {
-      showStatus("⚠️ No box selected", 3000);
-      return;
+    if (!isMultiSelectMode) {
+      setTimeout(() => this.classList.remove('button-active'), 300);
     }
+  });
 
-    const x = parseInt(selectedBox.style.left);
-    const y = parseInt(selectedBox.style.top);
-    tagData = tagData.filter(tag => tag.x !== x || tag.y !== y);
-    allImageData[imageName] = tagData;
-    selectedBox.remove();
-    updateTagLog();
-    await saveAllProgress();
-    showStatus("🗑️ Tag deleted", 3000);
-  } catch (error) {
-    console.error("Delete error:", error);
-    showStatus("⚠️ Error deleting tag", 3000);
-  } finally {
-    resetButtonState(btn);
-  }
-});
+  // Delete Selected Button
+  document.getElementById("deleteSelected").addEventListener("click", async function () {
+    const btn = this;
+    btn.classList.add('button-active');
 
-// Clear Image Data Button
-document.getElementById("clearImageData").addEventListener("click", async function() {
-  const btn = this;
-  btn.classList.add('button-active');
-  
-  try {
-    if (!confirm("Are you sure you want to delete all tags for this image?")) {
-      return;
-    }
-
-    tagData = [];
-    allImageData[imageName] = [];
-    clearCanvas();
-    updateTagLog();
-    await saveAllProgress();
-    showStatus("🧹 All tags cleared", 3000);
-  } catch (error) {
-    console.error("Clear image error:", error);
-    showStatus("⚠️ Error clearing image data", 3000);
-  } finally {
-    resetButtonState(btn);
-  }
-});
-
-// Clear All Data Button
-document.getElementById("clearAllData").addEventListener("click", async function() {
-  const btn = this;
-  btn.classList.add('button-active');
-  
-  try {
-    if (!confirm("Are you sure you want to delete ALL tags for EVERY image?")) {
-      return;
-    }
-
-    tagData = [];
-    allImageData = {};
-    clearCanvas();
-    updateTagLog();
-    await saveAllProgress();
-    showStatus("🧹 ALL tags cleared from ALL images", 4000);
-  } catch (error) {
-    console.error("Clear all error:", error);
-    showStatus("⚠️ Error clearing all data", 3000);
-  } finally {
-    resetButtonState(btn);
-  }
-});
-
-// Save Progress Button
-document.getElementById("saveProgress").addEventListener("click", async function() {
-  const btn = this;
-  btn.classList.add('button-active');
-  
-  try {
-    await saveAllProgress();
-    showStatus("💾 Progress saved", 2000);
-    
-    // Success animation
-    setTimeout(() => {
-      btn.classList.add('button-success');
-      setTimeout(() => btn.classList.remove('button-success'), 1000);
-    }, 10);
-  } catch (error) {
-    console.error("Save error:", error);
-    showStatus("⚠️ Error saving progress", 3000);
-  } finally {
-    resetButtonState(btn);
-  }
-});
-
-// ✅ Export CSV function (called after preview confirmation)
-async function exportCSV() {
-  const btn = document.getElementById("exportCSV");
-  btn.classList.add('button-active');
-
-  try {
-    // Robust CSV escaping function
-    const escapeCSV = (value) => {
-      if (value === null || value === undefined) return '';
-      value = String(value);
-      if (/[",\n]/.test(value)) {
-        return `"${value.replace(/"/g, '""')}"`;
+    try {
+      const selectedBox = imageContainer.querySelector(".draw-box.selected");
+      if (!selectedBox) {
+        showStatus("⚠️ No box selected", 3000);
+        return;
       }
-      return value;
-    };
 
-    // Process all tags with proper escaping
-    const mode = document.getElementById("modeSelector")?.value || "unspecified";
-
-    const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
-      return tags.map(tag => [
-  escapeCSV(imgName),
-  escapeCSV(tag.severity),
-  escapeCSV(tag.label),
-  escapeCSV(tag.codes.join("; ")),
-  tag.x,
-  tag.y,
-  tag.width,
-  tag.height,
-  escapeCSV(mode),
-  tag.sof ? "TRUE" : "FALSE"
- ]);
-});
-
-    if (!allTags.length) {
-      showStatus("⚠️ No data to export", 3000);
-      return;
+      const x = parseInt(selectedBox.style.left);
+      const y = parseInt(selectedBox.style.top);
+      tagData = tagData.filter(tag => tag.x !== x || tag.y !== y);
+      allImageData[imageName] = tagData;
+      selectedBox.remove();
+      updateTagLog();
+      await saveAllProgress();
+      showStatus("🗑️ Tag deleted", 3000);
+    } catch (error) {
+      console.error("Delete error:", error);
+      showStatus("⚠️ Error deleting tag", 3000);
+    } finally {
+      resetButtonState(btn);
     }
+  });
 
-    // Create header row with proper escaping
-    const headers = [
-  "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height", "Mode", "SOF"
-].map(escapeCSV);
+  // Clear Image Data Button
+  document.getElementById("clearImageData").addEventListener("click", async function () {
+    const btn = this;
+    btn.classList.add('button-active');
 
-    // Build CSV content
-    const csvContent = [
-      headers.join(","),
-      ...allTags.map(row => row.join(","))
-    ].join("\n");
+    try {
+      if (!confirm("Are you sure you want to delete all tags for this image?")) return;
 
-    // Create and trigger download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `violation_tags_export_${new Date().toISOString().slice(0,10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      tagData = [];
+      allImageData[imageName] = [];
+      clearCanvas();
+      updateTagLog();
+      await saveAllProgress();
+      showStatus("🧹 All tags cleared", 3000);
+    } catch (error) {
+      console.error("Clear image error:", error);
+      showStatus("⚠️ Error clearing image data", 3000);
+    } finally {
+      resetButtonState(btn);
+    }
+  });
 
-    showStatus("📤 CSV exported", 3000);
-  } catch (error) {
-    console.error("Export error:", error);
-    showStatus("⚠️ Error exporting CSV", 3000);
-  } finally {
-    resetButtonState(document.getElementById("exportCSV"));
-  }
-}
+  // Clear All Data Button
+  document.getElementById("clearAllData").addEventListener("click", async function () {
+    const btn = this;
+    btn.classList.add('button-active');
 
-// ✅ CSV Button — now launches preview modal before export
-document.getElementById("exportCSV").addEventListener("click", function () {
-  openPreviewModal(exportCSV);
+    try {
+      if (!confirm("Are you sure you want to delete ALL tags for EVERY image?")) return;
+
+      tagData = [];
+      allImageData = {};
+      clearCanvas();
+      updateTagLog();
+      await saveAllProgress();
+      showStatus("🧹 ALL tags cleared from ALL images", 4000);
+    } catch (error) {
+      console.error("Clear all error:", error);
+      showStatus("⚠️ Error clearing all data", 3000);
+    } finally {
+      resetButtonState(btn);
+    }
+  });
+
+  // Save Progress Button
+  document.getElementById("saveProgress").addEventListener("click", async function () {
+    const btn = this;
+    btn.classList.add('button-active');
+
+    try {
+      await saveAllProgress();
+      showStatus("💾 Progress saved", 2000);
+
+      setTimeout(() => {
+        btn.classList.add('button-success');
+        setTimeout(() => btn.classList.remove('button-success'), 1000);
+      }, 10);
+    } catch (error) {
+      console.error("Save error:", error);
+      showStatus("⚠️ Error saving progress", 3000);
+    } finally {
+      resetButtonState(btn);
+    }
+  });
+
+  // Export CSV – Preview Modal First
+  document.getElementById("exportCSV").addEventListener("click", function () {
+    openPreviewModal(exportCSV);
+  });
 });
