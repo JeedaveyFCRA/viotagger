@@ -1,5 +1,5 @@
-// 🔐 Airtable API Settings (LIVE)
-const AIRTABLE_TOKEN = 'Bearer patiiNzMeWbsIHD29.b5c3d562339758fef9d454a5f7b25aa5702f10a8e0d1506d8682de7ddbf80e77';
+// 🔐 Airtable API Settings
+const AIRTABLE_TOKEN = 'Bearer pat...'; // your token
 const AIRTABLE_BASE_ID = 'apppDRYBhN8W65aL5';
 const AIRTABLE_TABLE_NAME = 'ExportedViolations';
 
@@ -32,7 +32,7 @@ async function syncToAirtable(btn) {
           }
         };
 
-        console.log("📡 Syncing tag to Airtable:", record); // ✅ Log per record
+        console.log("📡 Syncing tag to Airtable:", record);
 
         const response = await fetch(AIRTABLE_URL, {
           method: "POST",
@@ -58,14 +58,12 @@ async function syncToAirtable(btn) {
     console.error("Airtable sync error:", err);
     showStatus("❌ Airtable sync failed. See console.", 5000);
   } finally {
-    console.log("🔁 Resetting button:", btn?.id); // ✅ Confirm cleanup runs
+    console.log("🔁 Resetting button:", btn?.id);
     resetButtonState(btn);
   }
 }
 
-
-
-// 🖱️ Connect to Top Panel Button
+// 🖱️ Wire to Sync Button with Preview Modal
 document.getElementById("syncAirtable").addEventListener("click", function () {
   const btn = this;
   openPreviewModal(() => syncToAirtable(btn));
