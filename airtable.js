@@ -8,6 +8,7 @@ const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE
 
 // 🚀 Sync Function
 async function syncToAirtable() {
+const mode = document.getElementById("modeSelector")?.value || "unspecified";
   let count = 0;
   try {
     for (const [image, tags] of Object.entries(allImageData)) {
@@ -22,6 +23,7 @@ async function syncToAirtable() {
             Y: tag.y,
             Width: tag.width,
             Height: tag.height
+            Mode: mode
           }
         };
 
