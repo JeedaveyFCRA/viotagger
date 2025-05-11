@@ -19,6 +19,47 @@ const saveTagBtn = document.getElementById("saveTag");
 const cancelTagBtn = document.getElementById("cancelTag");
 const statusBox = document.getElementById("status-message");
 
+
+
+// ========== LOAD IMAGE FUNCTIONALITY ==========
+
+// Handle file loading
+document.getElementById('loadImage').addEventListener('change', function(e) {
+  const btn = document.querySelector('label[for="loadImage"]');
+  btn.classList.add('button-active');
+  
+  const file = e.target.files[0];
+  if (!file) {
+    resetButtonState(btn);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    reportImg.src = event.target.result;
+    imageName = file.name;
+    clearCanvas();
+    tagData = allImageData[imageName] || [];
+    renderTags();
+    updateTagLog();
+    showStatus(`✅ Loaded image: ${file.name}`, 3000);
+    resetButtonState(btn);
+  };
+  reader.readAsDataURL(file);
+});
+
+// Reset button when clicked but no file selected
+document.querySelector('label[for="loadImage"]').addEventListener('click', function() {
+  setTimeout(() => {
+    if (!document.getElementById('loadImage').files[0]) {
+      resetButtonState(this);
+    }
+  }, 200);
+});
+
+
+
+
 // ========== INITIAL LOAD ==========
 loadAllProgress();
 
@@ -305,6 +346,31 @@ function getSelectedCreditor() {
   const selected = document.querySelector('input[name="creditor"]:checked');
   return selected ? selected.value : null;
 }
+
+
+
+
+
+
+// ========== FORM CONTROLS ==========
+
+// Mode Selector
+document.getElementById("modeSelector").addEventListener("change", function() {
+  const btn = this;
+  btn.classList.add('button-active');
+  showStatus(`Mode set to ${this.value === 'sample' ? 'Sample' : 'Final'}`, 2000);
+  
+  setTimeout(() => {
+    btn.classList.remove('button-active');
+  }, 300);
+});
+
+
+
+
+
+
+
 
 // Enable creditor radio buttons when bureau is selected
 document.querySelectorAll('input[name="bureau"]').forEach(radio => {
@@ -759,6 +825,20 @@ const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.hei
 
 // ========== TOP PANEL BUTTONS ==========
 
+
+
+function setButtonState(button, state) {
+  const validStates = ['active', 'disabled', 'processing', 'success', 'error'];
+  if (!validStates.includes(state)) return;
+  
+  button.classList.remove(...validStates.map(s => `button-${s}`));
+  if (state !== 'default') {
+    button.classList.add(`button-${state}`);
+  }
+}
+
+
+
 // Helper function to reset button state
 function resetButtonState(btn, delay = 200) {
   if (!btn) return;
@@ -767,6 +847,26 @@ function resetButtonState(btn, delay = 200) {
     btn.blur();
   }, delay);
 }
+
+
+
+
+document.getElementById("toggleMultiSelect").addEventListener("click", function() {
+  isMultiSelectMode = !isMultiSelectMode;
+  this.textContent = isMultiSelectMode ? "🔘 Multi: ON" : "🔘 Multi: OFF";
+  this.classList.toggle('button-active', isMultiSelectMode);
+  showStatus(isMultiSelectMode ? "Multi-select mode ON" : "Multi-select mode OFF", 2000);
+  
+  // Reset after brief period if not toggled on
+  if (!isMultiSelectMode) {
+    setTimeout(() => {
+      this.classList.remove('button-active');
+    }, 300);
+  }
+});
+
+
+
 
 // Delete Selected Button
 document.getElementById("deleteSelected").addEventListener("click", async function() {
