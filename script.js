@@ -527,6 +527,10 @@ function renderTags() {
 
 
 
+
+
+
+
 function makeBoxInteractive(box, tagArray) {
   let offsetX, offsetY, isDragging = false;
 
@@ -538,6 +542,10 @@ function makeBoxInteractive(box, tagArray) {
     if (tagIndex !== -1) box.dataset.tagIndex = tagIndex;
   }
 
+  // Make box focusable for keyboard interactions
+  box.setAttribute('tabindex', '0');
+  
+  // Mouse drag handling
   box.addEventListener("mousedown", (e) => {
     if (e.target.classList.contains("resize-handle")) return;
     e.stopPropagation();
@@ -546,8 +554,48 @@ function makeBoxInteractive(box, tagArray) {
     offsetY = e.offsetY;
     clearSelection();
     box.classList.add("selected");
+    box.focus(); // Focus the box when selected
   });
 
+  // Keyboard arrow key movement
+  box.addEventListener("keydown", (e) => {
+    if (!box.classList.contains("selected")) return;
+    
+    const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    if (arrowKeys.includes(e.key)) {
+      e.preventDefault();
+      const step = e.shiftKey ? 10 : 1; // Larger steps when Shift is held
+      const container = imageContainer.getBoundingClientRect();
+      let x = parseInt(box.style.left);
+      let y = parseInt(box.style.top);
+      const width = parseInt(box.style.width);
+      const height = parseInt(box.style.height);
+
+      switch(e.key) {
+        case 'ArrowUp': y = Math.max(0, y - step); break;
+        case 'ArrowDown': y = Math.min(container.height - height, y + step); break;
+        case 'ArrowLeft': x = Math.max(0, x - step); break;
+        case 'ArrowRight': x = Math.min(container.width - width, x + step); break;
+      }
+
+      // Update position
+      box.style.left = `${x}px`;
+      box.style.top = `${y}px`;
+
+      // Update data model
+      if (box.dataset.tagIndex !== undefined) {
+        const tag = tagArray[box.dataset.tagIndex];
+        if (tag) {
+          tag.x = x;
+          tag.y = y;
+          updateTagLog();
+          saveAllProgress();
+        }
+      }
+    }
+  });
+
+  // Mouse movement handling
   window.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
     const rect = imageContainer.getBoundingClientRect();
@@ -556,15 +604,15 @@ function makeBoxInteractive(box, tagArray) {
     box.style.left = `${newX}px`;
     box.style.top = `${newY}px`;
 
-    // Use the stored index to directly update the tag
-  if (box.dataset.tagIndex !== undefined) {
-    const tag = tagArray[box.dataset.tagIndex];
-    if (tag) {
-      tag.x = Math.round(parseInt(box.style.left));
-      tag.y = Math.round(parseInt(box.style.top));
-      tag.width = Math.round(parseInt(box.style.width));
-      tag.height = Math.round(parseInt(box.style.height));
-      updateTagLog()
+    // Update the associated tag data
+    if (box.dataset.tagIndex !== undefined) {
+      const tag = tagArray[box.dataset.tagIndex];
+      if (tag) {
+        tag.x = Math.round(newX);
+        tag.y = Math.round(newY);
+        tag.width = Math.round(parseInt(box.style.width));
+        tag.height = Math.round(parseInt(box.style.height));
+        updateTagLog();
       }
     }
 
@@ -639,7 +687,7 @@ function makeBoxInteractive(box, tagArray) {
         box.style.width = `${newWidth}px`;
         box.style.height = `${newHeight}px`;
 
-        // Use the stored index to directly update the tag
+        // Update the associated tag data
         if (box.dataset.tagIndex !== undefined) {
           const tag = tagArray[box.dataset.tagIndex];
           if (tag) {
@@ -670,6 +718,17 @@ function makeBoxInteractive(box, tagArray) {
     });
   });
 }
+
+
+
+
+
+
+
+
+
+
+
 
 // Rest of the code remains exactly the same...
 function updateTagLog() {
@@ -812,12 +871,24 @@ document.getElementById("exportCSV").addEventListener("click", async function() 
   btn.classList.add('button-active');
   
   try {
+    // Robust CSV escaping function
+    const escapeCSV = (value) => {
+      if (value === null || value === undefined) return '';
+      value = String(value);
+      // Escape quotes by doubling them and wrap in quotes if contains special chars
+      if (/[",\n]/.test(value)) {
+        return `"${value.replace(/"/g, '""')}"`;
+      }
+      return value;
+    };
+
+    // Process all tags with proper escaping
     const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
       return tags.map(tag => [
-        imgName,
-        tag.severity,
-        tag.label,
-        tag.codes.join("; "),
+        escapeCSV(imgName),
+        escapeCSV(tag.severity),
+        escapeCSV(tag.label),
+        escapeCSV(tag.codes.join("; ")),
         tag.x,
         tag.y,
         tag.width,
@@ -830,19 +901,26 @@ document.getElementById("exportCSV").addEventListener("click", async function() 
       return;
     }
 
-    const rows = [
-      ["Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height"],
-      ...allTags
-    ];
+    // Create header row with proper escaping
+    const headers = [
+      "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height"
+    ].map(escapeCSV);
 
-    const csvContent = rows.map(r => r.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    // Build CSV content
+    const csvContent = [
+      headers.join(","),
+      ...allTags.map(row => row.join(","))
+    ].join("\n");
+
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement("a");
     link.href = url;
     link.download = `violation_tags_export_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
     URL.revokeObjectURL(url);
     
     showStatus("📤 CSV exported", 3000);

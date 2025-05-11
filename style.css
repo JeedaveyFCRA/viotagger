@@ -506,6 +506,25 @@ input[type="radio"] {
   border-color: #0062cc;
 }
 
+
+
+
+
+
+.draw-box:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.draw-box.selected:focus {
+  outline: 2px solid #0056b3;
+}
+
+
+
+
+
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
   .modal-content {
