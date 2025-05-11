@@ -53,8 +53,11 @@ async function syncToAirtable(btn) {
           });
 
           if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
+  const errMsg = `❌ Airtable Error: HTTP ${response.status} — Check API token or base/table config.`;
+  console.error(errMsg);
+  showStatus(errMsg, 5000);
+  throw new Error(errMsg);
+}
 
           successCount++;
           showStatus(`✓ Syncing: ${successCount} sent...`, 1000);
