@@ -45,15 +45,9 @@ html {
 
 /* Replace your existing .button styles with these */
 .button {
-  background-color: #ffffff;
-  border: 1px solid #d0d0d0;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
-  margin: 0 2px;
+  cursor: pointer;
+  position: relative;
 }
 
 .button:hover {
@@ -62,10 +56,10 @@ html {
 }
 
 .button-active {
-  background-color: #e0e0e0 !important;
+  background-color: #3f51b5 !important;
+  color: white !important;
   transform: translateY(1px);
-  box-shadow: none !important;
-  transition: all 0.2s ease; /* Add smooth transition */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 
 /* Improved focus state - keeps accessibility but matches your aesthetic */
@@ -89,19 +83,19 @@ html {
   100% { background-color: #ffffff; }
 }
 
-/* Button success state */
 .button-success {
-  animation: buttonSuccess 1s ease-out;
+  background-color: #4caf50 !important;
+  color: white !important;
 }
 
 
-#status-message {
-  margin-top: 6px;
-  padding: 5px 10px;
-  background-color: #e8f4ff;
-  font-size: 12px;
+##status-message {
+  transition: opacity 0.3s ease;
   border-radius: 4px;
-  display: none;
+  padding: 5px 10px;
+  font-size: 14px;
+  margin-top: 5px;
+  opacity: 0;
 }
 
 
@@ -419,16 +413,15 @@ input[type="radio"] {
 /* ========== BOX EDITING MODAL STYLES ========== */
 /* Add these at the end of your style.css file */
 
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000; /* Higher than other elements */
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  backdrop-filter: blur(2px);
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  width: 80%;
+  max-width: 500px;
+  position: relative;
 }
 
 .modal-content {
@@ -484,10 +477,8 @@ input[type="radio"] {
 }
 
 .modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  text-align: right;
+  margin-top: 15px;
 }
 
 .modal-actions .button {
@@ -495,10 +486,9 @@ input[type="radio"] {
   font-size: 14px;
 }
 
-.modal-actions .button-primary {
-  background-color: #007bff;
+.modal-actions ..button-primary {
+  background-color: #4285f4;
   color: white;
-  border-color: #007bff;
 }
 
 .modal-actions .button-primary:hover {

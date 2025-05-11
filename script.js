@@ -229,6 +229,8 @@ document.addEventListener('DOMContentLoaded', setupBoxEditing);
 
 // ========== PREVIEW MODAL LOGIC ==========
 
+// ========== PREVIEW MODAL LOGIC ==========
+
 const previewModal = document.getElementById("previewModal");
 const previewTableBody = document.querySelector("#previewTable tbody");
 const previewCancel = document.getElementById("previewCancel");
@@ -236,6 +238,7 @@ const previewConfirm = document.getElementById("previewConfirm");
 
 let queuedExportFunction = null;
 
+// This function is used by both CSV export and Airtable sync
 function openPreviewModal(callback) {
   // Store the function to call after confirmation
   queuedExportFunction = callback;
@@ -244,6 +247,7 @@ function openPreviewModal(callback) {
   previewTableBody.innerHTML = "";
 
   const mode = document.getElementById("modeSelector")?.value || "unspecified";
+  let rowCount = 0;
 
   Object.entries(allImageData).forEach(([imgName, tags]) => {
     tags.forEach(tag => {
@@ -256,8 +260,15 @@ function openPreviewModal(callback) {
         <td>${mode}</td>
       `;
       previewTableBody.appendChild(row);
+      rowCount++;
     });
   });
+
+  // Only show modal if we have data
+  if (rowCount === 0) {
+    showStatus("⚠️ No data to preview", 3000);
+    return;
+  }
 
   previewModal.style.display = "block";
 }
@@ -268,9 +279,15 @@ previewCancel.addEventListener("click", () => {
 });
 
 previewConfirm.addEventListener("click", () => {
-  if (queuedExportFunction) queuedExportFunction();
+  if (queuedExportFunction) {
+    // Execute the callback (either exportCSV or the Airtable sync)
+    queuedExportFunction();
+  }
   previewModal.style.display = "none";
 });
+
+
+
 
 // ========== RADIO BUTTON LOGIC (REVISED WITH DATE BUTTONS) ==========
 
@@ -716,6 +733,41 @@ const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.hei
     `;
     log.appendChild(div);
   });
+}
+
+
+// ========== STATUS MESSAGES ==========
+
+// Ensure status message function exists and works properly
+function showStatus(message, duration = 3000) {
+  const statusBox = document.getElementById("status-message");
+  if (!statusBox) return; // Guard against missing element
+  
+  // Clear any existing timeout
+  if (statusBox._timeoutId) {
+    clearTimeout(statusBox._timeoutId);
+  }
+  
+  // Show the message with appropriate styling
+  statusBox.textContent = message;
+  statusBox.style.opacity = "1";
+  
+  // Apply color based on message type
+  if (message.includes("❌") || message.includes("⚠️")) {
+    statusBox.style.backgroundColor = message.includes("⚠️") ? "#ff9800" : "#f44336";
+    statusBox.style.color = "white";
+  } else if (message.includes("✅")) {
+    statusBox.style.backgroundColor = "#4caf50";
+    statusBox.style.color = "white";
+  } else {
+    statusBox.style.backgroundColor = "#2196f3";
+    statusBox.style.color = "white";
+  }
+  
+  // Clear after duration
+  statusBox._timeoutId = setTimeout(() => {
+    statusBox.style.opacity = "0";
+  }, duration);
 }
 
 
