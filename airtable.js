@@ -2,8 +2,7 @@
 const AIRTABLE_TOKEN = 'Bearer patiiNzMeWbsIHD29.b5c3d562339758fef9d454a5f7b25aa5702f10a8e0d1506d8682de7ddbf80e77';
 const AIRTABLE_BASE_ID = 'apppDRYBhN8W65aL5';
 const AIRTABLE_TABLE_NAME = 'ExportedViolations';
-
-
+const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
 
 
 // 🚀 Sync Function
