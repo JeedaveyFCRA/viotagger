@@ -8,6 +8,7 @@ let currentHints = [];
 let tagData = [];
 let allImageData = {};
 let imageName = "";
+let copiedTags = []; // Buffer to store copied tag data
 
 // ========== DOM ELEMENTS ==========
 
@@ -188,6 +189,38 @@ function setupBoxEditing() {
   });
 }
 
+
+
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // Only process if not in a text field or textarea
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+      return;
+    }
+    
+    // Copy selected boxes (Ctrl+C)
+    if (e.ctrlKey && e.key === 'c') {
+      e.preventDefault(); // Prevent browser's copy action
+      copySelectedBoxes();
+    }
+    
+    // Paste copied boxes (Ctrl+V)
+    if (e.ctrlKey && e.key === 'v') {
+      e.preventDefault(); // Prevent browser's paste action
+      pasteBoxes();
+    }
+  });
+}
+
+// Initialize keyboard shortcuts
+document.addEventListener('DOMContentLoaded', () => {
+  setupKeyboardShortcuts();
+});
+
+
+
+
+
 function showEditModal(box) {
   const modal = document.getElementById('editBoxModal');
   const rect = box.getBoundingClientRect();
@@ -321,7 +354,90 @@ function hideEditModal() {
   document.getElementById('editBoxModal').style.display = 'none';
 }
 
+function copySelectedBoxes() {
+  const selectedBoxes = document.querySelectorAll('.draw-box.selected');
+  if (selectedBoxes.length === 0) {
+    showStatus("⚠️ No boxes selected to copy", 3000);
+    return;
+  }
+  
+  copiedTags = [];
+  
+  selectedBoxes.forEach(box => {
+    const tagIndex = parseInt(box.dataset.tagIndex);
+    if (tagIndex >= 0 && tagData[tagIndex]) {
+      // Create a deep copy of the tag
+      copiedTags.push(JSON.parse(JSON.stringify(tagData[tagIndex])));
+    }
+  });
+  
+  showStatus(`✅ Copied ${copiedTags.length} box(es)`, 3000);
+}
 
+function pasteBoxes() {
+  if (copiedTags.length === 0) {
+    showStatus("⚠️ Nothing to paste", 3000);
+    return;
+  }
+  
+  // Clear any current selection
+  clearSelection();
+  
+  // Calculate offset for pasted boxes (20px right and down)
+  const OFFSET_X = 20;
+  const OFFSET_Y = 20;
+  
+  // Create new boxes from copied tags
+  copiedTags.forEach(originalTag => {
+    // Create a new tag with offset position
+    const newTag = JSON.parse(JSON.stringify(originalTag));
+    newTag.x += OFFSET_X;
+    newTag.y += OFFSET_Y;
+    
+    // Ensure the new box is within bounds
+    const containerWidth = imageContainer.clientWidth;
+    const containerHeight = imageContainer.clientHeight;
+    
+    if (newTag.x + newTag.width > containerWidth) {
+      newTag.x = containerWidth - newTag.width;
+    }
+    
+    if (newTag.y + newTag.height > containerHeight) {
+      newTag.y = containerHeight - newTag.height;
+    }
+    
+    // Add the new tag to the data
+    tagData.push(newTag);
+    
+    // Create and render the new box
+    const box = document.createElement("div");
+    box.className = "draw-box selected";
+    box.style.left = `${newTag.x}px`;
+    box.style.top = `${newTag.y}px`;
+    box.style.width = `${newTag.width}px`;
+    box.style.height = `${newTag.height}px`;
+    box.dataset.tagIndex = tagData.length - 1;
+    
+    // Make the new box interactive
+    makeBoxInteractive(box, tagData);
+    
+    // Add resize handles
+    ["tl", "tr", "bl", "br"].forEach(pos => {
+      const handle = document.createElement("div");
+      handle.className = `resize-handle ${pos}`;
+      box.appendChild(handle);
+    });
+    
+    imageContainer.appendChild(box);
+  });
+  
+  // Update storage and UI
+  allImageData[imageName] = tagData;
+  updateTagLog();
+  saveAllProgress();
+  
+  showStatus(`✅ Pasted ${copiedTags.length} box(es)`, 3000);
+}
 
 
 
@@ -626,6 +742,13 @@ function renderTags() {
 }
 
 
+
+
+
+
+
+
+
 function makeBoxInteractive(box, tagArray) {
   let offsetX, offsetY, isDragging = false;
 
@@ -647,7 +770,12 @@ function makeBoxInteractive(box, tagArray) {
     isDragging = true;
     offsetX = e.offsetX;
     offsetY = e.offsetY;
-    clearSelection();
+    
+    // If shift key is pressed, allow multi-select
+    if (!e.shiftKey) {
+      clearSelection();
+    }
+    
     box.classList.add("selected");
     box.focus(); // Focus the box when selected
   });
@@ -813,6 +941,13 @@ function makeBoxInteractive(box, tagArray) {
     });
   });
 }
+
+
+
+
+
+
+
 
 
 function updateTagLog() {
