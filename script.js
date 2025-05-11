@@ -264,6 +264,58 @@ document.addEventListener('DOMContentLoaded', setupBoxEditing);
 
 
 
+// ========== PREVIEW MODAL LOGIC ==========
+
+const previewModal = document.getElementById("previewModal");
+const previewTableBody = document.querySelector("#previewTable tbody");
+const previewCancel = document.getElementById("previewCancel");
+const previewConfirm = document.getElementById("previewConfirm");
+
+let queuedExportFunction = null;
+
+function openPreviewModal(callback) {
+  // Store the function to call after confirmation
+  queuedExportFunction = callback;
+
+  // Clear old rows
+  previewTableBody.innerHTML = "";
+
+  const mode = document.getElementById("modeSelector")?.value || "unspecified";
+
+  Object.entries(allImageData).forEach(([imgName, tags]) => {
+    tags.forEach(tag => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${imgName}</td>
+        <td>${tag.severity}</td>
+        <td>${tag.label}</td>
+        <td>${tag.codes.join("; ")}</td>
+        <td>${mode}</td>
+      `;
+      previewTableBody.appendChild(row);
+    });
+  });
+
+  previewModal.style.display = "block";
+}
+
+previewCancel.addEventListener("click", () => {
+  previewModal.style.display = "none";
+  queuedExportFunction = null;
+});
+
+previewConfirm.addEventListener("click", () => {
+  if (queuedExportFunction) queuedExportFunction();
+  previewModal.style.display = "none";
+});
+
+
+
+
+
+
+
+
 
 
 
@@ -865,17 +917,16 @@ document.getElementById("saveProgress").addEventListener("click", async function
   }
 });
 
-// Export CSV Button
-document.getElementById("exportCSV").addEventListener("click", async function() {
-  const btn = this;
+// ✅ Export CSV function (called after preview confirmation)
+async function exportCSV() {
+  const btn = document.getElementById("exportCSV");
   btn.classList.add('button-active');
-  
+
   try {
     // Robust CSV escaping function
     const escapeCSV = (value) => {
       if (value === null || value === undefined) return '';
       value = String(value);
-      // Escape quotes by doubling them and wrap in quotes if contains special chars
       if (/[",\n]/.test(value)) {
         return `"${value.replace(/"/g, '""')}"`;
       }
@@ -885,19 +936,19 @@ document.getElementById("exportCSV").addEventListener("click", async function() 
     // Process all tags with proper escaping
     const mode = document.getElementById("modeSelector")?.value || "unspecified";
 
-const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
-  return tags.map(tag => [
-    escapeCSV(imgName),
-    escapeCSV(tag.severity),
-    escapeCSV(tag.label),
-    escapeCSV(tag.codes.join("; ")),
-    tag.x,
-    tag.y,
-    tag.width,
-    tag.height,
-    escapeCSV(mode)  // ✅ Add mode here
-  ]);
-});
+    const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
+      return tags.map(tag => [
+        escapeCSV(imgName),
+        escapeCSV(tag.severity),
+        escapeCSV(tag.label),
+        escapeCSV(tag.codes.join("; ")),
+        tag.x,
+        tag.y,
+        tag.width,
+        tag.height,
+        escapeCSV(mode)
+      ]);
+    });
 
     if (!allTags.length) {
       showStatus("⚠️ No data to export", 3000);
@@ -906,8 +957,8 @@ const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
 
     // Create header row with proper escaping
     const headers = [
-  "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height", "Mode"
-].map(escapeCSV);
+      "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height", "Mode"
+    ].map(escapeCSV);
 
     // Build CSV content
     const csvContent = [
@@ -925,7 +976,7 @@ const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    
+
     showStatus("📤 CSV exported", 3000);
   } catch (error) {
     console.error("Export error:", error);
@@ -933,4 +984,9 @@ const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
   } finally {
     resetButtonState(btn);
   }
+}
+
+// ✅ CSV Button — now launches preview modal before export
+document.getElementById("exportCSV").addEventListener("click", function () {
+  openPreviewModal(exportCSV);
 });
