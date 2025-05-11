@@ -96,5 +96,34 @@
 <script src="imageMap.js"></script>
 <script src="script.js"></script>
 
+
+
+<!-- Add to your HTML (near the existing popup) -->
+<div id="editBoxModal" class="modal">
+  <div class="modal-content">
+    <h3>Edit Box Dimensions</h3>
+    <div class="form-group">
+      <label>X:</label>
+      <input type="number" id="editBoxX" class="coord-input">
+    </div>
+    <div class="form-group">
+      <label>Y:</label>
+      <input type="number" id="editBoxY" class="coord-input">
+    </div>
+    <div class="form-group">
+      <label>Width:</label>
+      <input type="number" id="editBoxW" class="coord-input">
+    </div>
+    <div class="form-group">
+      <label>Height:</label>
+      <input type="number" id="editBoxH" class="coord-input">
+    </div>
+    <div class="modal-actions">
+      <button id="editBoxCancel" class="button">Cancel</button>
+      <button id="editBoxConfirm" class="button button-primary">OK</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

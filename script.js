@@ -167,6 +167,106 @@ saveTagBtn.addEventListener("click", () => {
 
 
 
+// ========== BOX EDITING FUNCTIONALITY ==========
+
+// Add to your existing script.js
+function setupBoxEditing() {
+  // Double-click handler for boxes
+  imageContainer.addEventListener('dblclick', (e) => {
+    if (e.target.classList.contains('draw-box')) {
+      const box = e.target;
+      showEditModal(box);
+    }
+  });
+
+  // Modal confirm handler
+  document.getElementById('editBoxConfirm').addEventListener('click', () => {
+    const box = document.querySelector('.draw-box.selected');
+    if (!box) return;
+
+    const newX = parseInt(document.getElementById('editBoxX').value);
+    const newY = parseInt(document.getElementById('editBoxY').value);
+    const newW = parseInt(document.getElementById('editBoxW').value);
+    const newH = parseInt(document.getElementById('editBoxH').value);
+
+    if (isNaN(newX) || isNaN(newY) || isNaN(newW) || isNaN(newH)) {
+      showStatus("⚠️ Please enter valid numbers", 3000);
+      return;
+    }
+
+    // Update box position and size
+    box.style.left = `${newX}px`;
+    box.style.top = `${newY}px`;
+    box.style.width = `${newW}px`;
+    box.style.height = `${newH}px`;
+
+    // Update the associated tag data
+    const tagIndex = box.dataset.tagIndex;
+    if (tagIndex !== undefined && tagData[tagIndex]) {
+      tagData[tagIndex].x = newX;
+      tagData[tagIndex].y = newY;
+      tagData[tagIndex].width = newW;
+      tagData[tagIndex].height = newH;
+      
+      // Update storage and UI
+      allImageData[imageName] = tagData;
+      updateTagLog();
+      saveAllProgress();
+    }
+
+    hideEditModal();
+    showStatus("✅ Box updated", 2000);
+  });
+
+  // Modal cancel handler
+  document.getElementById('editBoxCancel').addEventListener('click', hideEditModal);
+}
+
+function showEditModal(box) {
+  const modal = document.getElementById('editBoxModal');
+  const rect = box.getBoundingClientRect();
+  const containerRect = imageContainer.getBoundingClientRect();
+
+  // Calculate relative coordinates
+  const x = rect.left - containerRect.left;
+  const y = rect.top - containerRect.top;
+  const width = rect.width;
+  const height = rect.height;
+
+  // Populate inputs
+  document.getElementById('editBoxX').value = Math.round(x);
+  document.getElementById('editBoxY').value = Math.round(y);
+  document.getElementById('editBoxW').value = Math.round(width);
+  document.getElementById('editBoxH').value = Math.round(height);
+
+  // Show modal
+  modal.style.display = 'block';
+  clearSelection();
+  box.classList.add('selected');
+}
+
+function hideEditModal() {
+  document.getElementById('editBoxModal').style.display = 'none';
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', setupBoxEditing);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -457,12 +557,14 @@ function makeBoxInteractive(box, tagArray) {
     box.style.top = `${newY}px`;
 
     // Use the stored index to directly update the tag
-    if (box.dataset.tagIndex !== undefined) {
-      const tag = tagArray[box.dataset.tagIndex];
-      if (tag) {
-        tag.x = Math.round(newX);
-        tag.y = Math.round(newY);
-        updateTagLog();
+  if (box.dataset.tagIndex !== undefined) {
+    const tag = tagArray[box.dataset.tagIndex];
+    if (tag) {
+      tag.x = Math.round(parseInt(box.style.left));
+      tag.y = Math.round(parseInt(box.style.top));
+      tag.width = Math.round(parseInt(box.style.width));
+      tag.height = Math.round(parseInt(box.style.height));
+      updateTagLog()
       }
     }
 
