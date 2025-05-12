@@ -133,26 +133,41 @@ html {
 /* Image Placeholder Styling */
 .image-placeholder-text {
   position: absolute;
-  top: 50%;
+  top: 40%; /* Moved up by adjusting from 50% to 40% */
   left: 50%;
   transform: translate(-50%, -50%);
   font-family: 'Space Grotesk', Arial, sans-serif;
   font-weight: bold;
   font-size: 22px;
-  color: #333;
-  background-color: rgba(255, 255, 0, 0.2); /* Very light yellow background */
-  padding: 12px 20px;
+  color: white; /* White text like the severe violation labels */
+  background-color: #c62828; /* Deep red matching the severe violation style */
+  padding: 16px 24px;
   border-radius: 8px;
   text-align: center;
   width: auto;
   max-width: 80%;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow for more impact */
   z-index: 1;
-  pointer-events: none; /* Ensures it doesn't interfere with clicks */
+  pointer-events: none;
   transition: opacity 0.3s ease;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.image-placeholder-text strong {
+  font-size: 24px;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
 }
 
 .image-loaded .image-placeholder-text {
+  opacity: 0;
+}
+
+/* Hide the default alt text and icon */
+#report-img[src=""] {
   opacity: 0;
 }
 
