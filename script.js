@@ -194,6 +194,7 @@ function setupBoxEditing() {
 
 
 
+
 function setupKeyboardShortcuts() {
   document.addEventListener('keydown', (e) => {
     // Only process if not in a text field or textarea
@@ -229,6 +230,12 @@ function setupKeyboardShortcuts() {
     if (e.ctrlKey && e.key === 'z') {
       e.preventDefault();
       undoLastAction();
+    }
+    
+    // Delete selected boxes (Delete key)
+    if (e.key === 'Delete') {
+      e.preventDefault();
+      deleteSelectedBoxes();
     }
   });
 }
@@ -547,6 +554,96 @@ function ungroupSelectedBoxes() {
   
   showStatus("✅ Boxes ungrouped", 3000);
 }
+
+
+
+
+
+
+
+
+
+function deleteSelectedBoxes() {
+  const selectedBoxes = document.querySelectorAll('.draw-box.selected');
+  
+  if (selectedBoxes.length === 0) {
+    showStatus("⚠️ No boxes selected to delete", 3000);
+    return;
+  }
+  
+  // Save current state for undo
+  saveToUndoStack();
+  
+  // Track deleted indices and groups to update
+  const deletedIndices = [];
+  const groupsToUpdate = new Set();
+  
+  // First pass: identify what we're deleting and which groups need updates
+  selectedBoxes.forEach(box => {
+    const tagIndex = parseInt(box.dataset.tagIndex);
+    if (tagIndex >= 0) {
+      deletedIndices.push(tagIndex);
+      
+      // If this box is part of a group, mark the group for updating
+      if (box.dataset.groupId) {
+        groupsToUpdate.add(box.dataset.groupId);
+      }
+      
+      // Remove the element from DOM
+      box.remove();
+    }
+  });
+  
+  // Sort indices in descending order to avoid reindex issues when splicing
+  deletedIndices.sort((a, b) => b - a);
+  
+  // Remove tags from tagData
+  deletedIndices.forEach(index => {
+    tagData.splice(index, 1);
+  });
+  
+  // Update group information
+  groupsToUpdate.forEach(groupId => {
+    if (boxGroups[groupId]) {
+      // Filter out deleted indices
+      boxGroups[groupId] = boxGroups[groupId].filter(idx => !deletedIndices.includes(idx));
+      
+      // Adjust indices that have shifted due to deletion
+      boxGroups[groupId] = boxGroups[groupId].map(idx => {
+        // Count how many deleted indices were before this one
+        const shift = deletedIndices.filter(delIdx => delIdx < idx).length;
+        return idx - shift;
+      });
+      
+      // If group is now empty, remove it
+      if (boxGroups[groupId].length === 0) {
+        delete boxGroups[groupId];
+      }
+    }
+  });
+  
+  // Update storage
+  allImageData[imageName] = tagData;
+  saveAllProgress();
+  saveGroups();
+  
+  // Re-render everything to ensure indices are correct
+  renderTags();
+  updateTagLog();
+  
+  showStatus(`🗑️ Deleted ${selectedBoxes.length} box(es)`, 3000);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 function saveGroups() {
   // Store group information in local storage
