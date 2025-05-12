@@ -133,20 +133,20 @@ html {
 /* Image Placeholder Styling */
 .image-placeholder-text {
   position: absolute;
-  top: 40%; /* Moved up by adjusting from 50% to 40% */
+  top: 25%; /* Moved up significantly to 25% (approximately 2.5" higher) */
   left: 50%;
   transform: translate(-50%, -50%);
   font-family: 'Space Grotesk', Arial, sans-serif;
   font-weight: bold;
-  font-size: 22px;
-  color: white; /* White text like the severe violation labels */
+  font-size: 24px; /* Base font size for both lines */
+  color: white;
   background-color: #c62828; /* Deep red matching the severe violation style */
   padding: 16px 24px;
   border-radius: 8px;
   text-align: center;
   width: auto;
   max-width: 80%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow for more impact */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 1;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -157,9 +157,13 @@ html {
 }
 
 .image-placeholder-text strong {
-  font-size: 24px;
+  font-size: 22px; /* Same size as the base */
   margin-bottom: 6px;
   letter-spacing: 0.5px;
+}
+
+.image-placeholder-text span {
+  font-size: 22px; /* Same size as the base and first line */
 }
 
 .image-loaded .image-placeholder-text {
