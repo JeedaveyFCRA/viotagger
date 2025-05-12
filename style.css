@@ -424,6 +424,37 @@ input[type="radio"] {
 
 
 
+
+
+
+
+  /* Add this to your CSS */
+  .button-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: -3px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  
+  /* For filled icons */
+  .button-icon.filled {
+    fill: currentColor;
+    stroke: none;
+  }
+  
+  /* For partially filled icons */
+  .button-icon.partial-fill path.fill-path {
+    fill: currentColor;
+  }
+
+
+
 /* 🔽 Tag Popup */
 #popup {
   position: absolute;

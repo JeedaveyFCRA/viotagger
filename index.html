@@ -11,24 +11,82 @@
   <div id="top-panel">
    <div id="top-title">Violation Tagging Tool</div>
     <div class="control-panel">
-      <label for="loadImage" class="button">📁 Load Image</label>
+      <label for="loadImage" class="button">
+        <svg class="button-icon" viewBox="0 0 24 24">
+          <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path>
+          <path d="M8 2v4"></path>
+          <path d="M16 2v4"></path>
+          <path d="M12 10v6"></path>
+          <path d="M9 13l3 3 3-3"></path>
+        </svg>
+        Load Image
+      </label>
       <input type="file" id="loadImage" accept=".png,.jpg,.jpeg" style="display:none" />
-      <button id="exportCSV" class="button">📤 Export CSV</button>
-      <button id="toggleMultiSelect" class="button">🔘 Multi: OFF</button>
-      <button id="deleteSelected" class="button">🗑️ Delete Selected</button>
-      <button id="clearImageData" class="button">🧹 Clear Image Data</button>
-      <button id="clearAllData" class="button">🧹 Clear ALL Data</button>
-      <button id="saveProgress" class="button">💾 Save Progress</button>
-      <button id="syncAirtable" class="button">📡 Sync to Airtable</button>
-
-<select id="modeSelector" class="button" style="width:auto; padding:6px 10px; height:34px;">
-  <option value="sample">🧪 Sample Mode</option>
-  <option value="final">✅ Final Mode</option>
-</select>
-
-
-
-
+      
+      <button id="exportCSV" class="button">
+        <svg class="button-icon" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Export CSV
+      </button>
+      
+      <button id="toggleMultiSelect" class="button">
+        <svg class="button-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="4" class="fill-path"></circle>
+        </svg>
+        Multi: OFF
+      </button>
+      
+      <button id="deleteSelected" class="button">
+        <svg class="button-icon" viewBox="0 0 24 24">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        Delete Selected
+      </button>
+      
+      <button id="clearImageData" class="button">
+        <svg class="button-icon" viewBox="0 0 24 24">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+        Clear Image Data
+      </button>
+      
+      <button id="clearAllData" class="button">
+        <svg class="button-icon" viewBox="0 0 24 24">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="4" y1="10" x2="20" y2="10"></line>
+        </svg>
+        Clear ALL Data
+      </button>
+      
+      <button id="saveProgress" class="button">
+        <svg class="button-icon" viewBox="0 0 24 24">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        Save Progress
+      </button>
+      
+      <button id="syncAirtable" class="button">
+        <svg class="button-icon" viewBox="0 0 24 24">
+          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+        </svg>
+        Sync to Airtable
+      </button>
+      
+      <select id="modeSelector" class="button" style="width:auto; padding:6px 10px; height:34px;">
+        <option value="sample">Sample Mode</option>
+        <option value="final">Final Mode</option>
+      </select>
     </div>
     <div id="status-message"></div>
   </div>
@@ -48,13 +106,13 @@
     <!-- 🎯 Center Panel: Image Canvas -->
     <div id="image-viewer">
       <div id="image-container">
-  <div class="image-placeholder-text">
-    <strong>Select Bureau & Creditor</strong>
-    to begin VioTagging!
-  </div>
-  <img id="report-img" src="" alt="" /> <!-- Removed alt text -->
-  <!-- Drawn boxes go here -->
-</div>
+        <div class="image-placeholder-text">
+          <strong>Select Bureau & Creditor</strong>
+          <span>to begin VioTagging!</span>
+        </div>
+        <img id="report-img" src="" alt="" />
+        <!-- Drawn boxes go here -->
+      </div>
     </div>
 
 <!-- 📋 Right Panel: Radio Buttons for Bureau and Creditor -->
@@ -113,8 +171,7 @@
 
 
 
-
-<!-- Edit Box Modal (Updated) -->
+<!-- Add to your HTML (near the existing popup) -->
 <div id="editBoxModal" class="modal">
   <div class="modal-content">
     <h3>Edit Violation Box</h3>
