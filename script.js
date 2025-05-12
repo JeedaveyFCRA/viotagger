@@ -904,9 +904,30 @@ function clearCanvas() {
   [...imageContainer.querySelectorAll(".draw-box")].forEach(el => el.remove());
 }
 
+
+
+
 function clearSelection() {
   document.querySelectorAll(".draw-box.selected").forEach(box => box.classList.remove("selected"));
 }
+
+function selectGroup(groupId) {
+  if (!groupId) return false;
+  
+  // Find all boxes with this group ID
+  const groupBoxes = document.querySelectorAll(`.draw-box[data-group-id="${groupId}"]`);
+  
+  if (groupBoxes.length === 0) return false;
+  
+  // Select all boxes in the group
+  groupBoxes.forEach(box => {
+    box.classList.add("selected");
+  });
+  
+  return true;
+}
+
+
 
 
 function renderTags() {
@@ -925,26 +946,66 @@ function renderTags() {
     box.style.height = `${tag.height}px`;
     box.dataset.tagIndex = index; // Store index on box element
 
+    // Check if this tag is part of a group
+    for (const [groupId, tagIndices] of Object.entries(boxGroups)) {
+      if (tagIndices.includes(index)) {
+        box.dataset.groupId = groupId;
+        box.classList.add('grouped');
+        break;
+      }
+    }
+    
     // Drag logic - simplified since makeBoxInteractive handles this now
     box.addEventListener("mousedown", (e) => {
       if (e.target.classList.contains("resize-handle")) return;
       e.stopPropagation();
-      clearSelection();
+      
+      // Get the group ID (if any)
+      const groupId = box.dataset.groupId;
+      
+      // If shift is not pressed, clear selection
+      if (!e.shiftKey) {
+        clearSelection();
+        
+        // If box is part of a group, select the whole group
+        if (groupId) {
+          selectGroup(groupId);
+          return; // Exit early as we've handled selection
+        }
+      }
+      
       box.classList.add("selected");
     });
-
+    
     // Add four resize handles
     ["tl", "tr", "bl", "br"].forEach(pos => {
       const handle = document.createElement("div");
       handle.className = `resize-handle ${pos}`;
       box.appendChild(handle);
     });
-
+    
     // Make box interactive with proper tag association
     makeBoxInteractive(box, tagData);
     
     imageContainer.appendChild(box);
   });
+}
+
+// Add this helper function after the renderTags function
+function selectGroup(groupId) {
+  if (!groupId) return false;
+  
+  // Find all boxes with this group ID
+  const groupBoxes = document.querySelectorAll(`.draw-box[data-group-id="${groupId}"]`);
+  
+  if (groupBoxes.length === 0) return false;
+  
+  // Select all boxes in the group
+  groupBoxes.forEach(box => {
+    box.classList.add("selected");
+  });
+  
+  return true;
 }
 
 
@@ -969,7 +1030,7 @@ function makeBoxInteractive(box, tagArray) {
   // Make box focusable for keyboard interactions
   box.setAttribute('tabindex', '0');
   
-  // Mouse drag handling
+
   // Mouse drag handling
 box.addEventListener("mousedown", (e) => {
   if (e.target.classList.contains("resize-handle")) return;
@@ -984,19 +1045,32 @@ box.addEventListener("mousedown", (e) => {
     return; // The setupMultiBoxMovement handler will handle this
   }
   
+  // Check if this box is part of a group
+  const groupId = box.dataset.groupId;
+  
   // Otherwise, handle as a single box drag
   isDragging = true;
   offsetX = e.offsetX;
   offsetY = e.offsetY;
   
-  // If shift key is pressed, allow multi-select
+  // If shift key is pressed, allow multi-select without clearing
   if (!e.shiftKey) {
     clearSelection();
+    
+    // If box is part of a group and not using shift-select, select the whole group
+    if (groupId && !e.shiftKey) {
+      selectGroup(groupId);
+      return; // Exit early as we've handled selection
+    }
   }
   
+  // Add selection to the clicked box
   box.classList.add("selected");
   box.focus(); // Focus the box when selected
 });
+
+
+
 
   // Keyboard arrow key movement
   box.addEventListener("keydown", (e) => {
@@ -1258,6 +1332,7 @@ function setupMultiBoxMovement() {
 document.addEventListener('DOMContentLoaded', () => {
   setupKeyboardShortcuts();
   setupMultiBoxMovement();
+  loadGroups(); // Add this line to load saved groups
 });
 
 
