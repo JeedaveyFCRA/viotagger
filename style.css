@@ -157,13 +157,13 @@ html {
 }
 
 .image-placeholder-text strong {
-  font-size: 22px; /* Same size as the base */
+  font-size: 24px; /* Same size as the base */
   margin-bottom: 6px;
   letter-spacing: 0.5px;
 }
 
 .image-placeholder-text span {
-  font-size: 22px; /* Same size as the base and first line */
+  font-size: 24px; /* Same size as the base and first line */
 }
 
 .image-loaded .image-placeholder-text {
