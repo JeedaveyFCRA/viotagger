@@ -921,13 +921,24 @@ function loadRemoteImage(fullImageName, bureau) {
     updateTagLog();
     populateDropdown();
     renderHints();
+    
+    // Add this line to add a class when image is loaded
+    imageContainer.classList.add('image-loaded');
+    
     showStatus(`✅ Loaded image: ${imageName}`, 3000);
   };
 
   reportImg.onerror = () => {
+    // Remove the class if image fails to load
+    imageContainer.classList.remove('image-loaded');
     showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 }
+
+
+
+
+
 
 // ========== HINTS + POPUP ==========
 
