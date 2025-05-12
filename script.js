@@ -9,6 +9,9 @@ let tagData = [];
 let allImageData = {};
 let imageName = "";
 let copiedTags = []; // Buffer to store copied tag data
+let boxGroups = {}; // For storing groups of boxes
+let groupCounter = 0; // For generating unique group IDs
+let undoStack = []; // For storing undo history
 
 // ========== DOM ELEMENTS ==========
 
@@ -208,6 +211,24 @@ function setupKeyboardShortcuts() {
     if (e.ctrlKey && e.key === 'v') {
       e.preventDefault(); // Prevent browser's paste action
       pasteBoxes();
+    }
+    
+    // Group selected boxes (Ctrl+G)
+    if (e.ctrlKey && e.key === 'g') {
+      e.preventDefault();
+      groupSelectedBoxes();
+    }
+    
+    // Ungroup selected group (Ctrl+U)
+    if (e.ctrlKey && e.key === 'u') {
+      e.preventDefault();
+      ungroupSelectedBoxes();
+    }
+    
+    // Undo last action (Ctrl+Z)
+    if (e.ctrlKey && e.key === 'z') {
+      e.preventDefault();
+      undoLastAction();
     }
   });
 }
@@ -435,6 +456,194 @@ function pasteBoxes() {
   
   showStatus(`✅ Pasted ${copiedTags.length} box(es)`, 3000);
 }
+
+
+
+
+
+
+function groupSelectedBoxes() {
+  const selectedBoxes = document.querySelectorAll('.draw-box.selected');
+  
+  if (selectedBoxes.length < 2) {
+    showStatus("⚠️ Select at least 2 boxes to group", 3000);
+    return;
+  }
+  
+  // Save current state for undo
+  saveToUndoStack();
+  
+  // Generate a unique group ID
+  const groupId = `group_${Date.now()}_${groupCounter++}`;
+  
+  // Store the indices of the boxes in this group
+  boxGroups[groupId] = [];
+  
+  // Add a data attribute to each box in the group
+  selectedBoxes.forEach(box => {
+    const tagIndex = parseInt(box.dataset.tagIndex);
+    if (tagIndex >= 0) {
+      // Store group info on the box element
+      box.dataset.groupId = groupId;
+      
+      // Store group info in our groups tracking object
+      boxGroups[groupId].push(tagIndex);
+      
+      // Add a visual indicator for grouped boxes
+      box.classList.add('grouped');
+    }
+  });
+  
+  // Store group information in local storage
+  saveGroups();
+  
+  showStatus(`✅ Grouped ${selectedBoxes.length} boxes`, 3000);
+}
+
+function ungroupSelectedBoxes() {
+  const selectedBoxes = document.querySelectorAll('.draw-box.selected');
+  
+  if (selectedBoxes.length === 0) {
+    showStatus("⚠️ No boxes selected to ungroup", 3000);
+    return;
+  }
+  
+  // Check if any selected box is part of a group
+  let foundGroup = false;
+  let groupsToRemove = new Set();
+  
+  selectedBoxes.forEach(box => {
+    if (box.dataset.groupId) {
+      foundGroup = true;
+      groupsToRemove.add(box.dataset.groupId);
+    }
+  });
+  
+  if (!foundGroup) {
+    showStatus("⚠️ Selected boxes are not in a group", 3000);
+    return;
+  }
+  
+  // Save current state for undo
+  saveToUndoStack();
+  
+  // Process each group to remove
+  groupsToRemove.forEach(groupId => {
+    // Get all boxes in this group
+    const groupBoxes = document.querySelectorAll(`.draw-box[data-group-id="${groupId}"]`);
+    
+    // Remove group attributes from each box
+    groupBoxes.forEach(box => {
+      box.removeAttribute('data-group-id');
+      box.classList.remove('grouped');
+    });
+    
+    // Remove the group from our tracking
+    delete boxGroups[groupId];
+  });
+  
+  // Update storage
+  saveGroups();
+  
+  showStatus("✅ Boxes ungrouped", 3000);
+}
+
+function saveGroups() {
+  // Store group information in local storage
+  try {
+    localStorage.setItem("violationGroups", JSON.stringify(boxGroups));
+  } catch (e) {
+    console.error("Error saving groups:", e);
+  }
+}
+
+function loadGroups() {
+  // Load group information from local storage
+  try {
+    const savedGroups = localStorage.getItem("violationGroups");
+    if (savedGroups) {
+      boxGroups = JSON.parse(savedGroups);
+      
+      // Apply group attributes to boxes
+      Object.entries(boxGroups).forEach(([groupId, tagIndices]) => {
+        tagIndices.forEach(tagIndex => {
+          const box = document.querySelector(`.draw-box[data-tag-index="${tagIndex}"]`);
+          if (box) {
+            box.dataset.groupId = groupId;
+            box.classList.add('grouped');
+          }
+        });
+      });
+    }
+  } catch (e) {
+    console.error("Error loading groups:", e);
+  }
+}
+
+
+
+
+
+
+
+
+function saveToUndoStack() {
+  // Save current state to undo stack
+  const state = {
+    tagData: JSON.parse(JSON.stringify(tagData)),
+    boxGroups: JSON.parse(JSON.stringify(boxGroups))
+  };
+  
+  undoStack.push(state);
+  
+  // Limit undo stack size to prevent memory issues
+  if (undoStack.length > 20) {
+    undoStack.shift(); // Remove oldest item
+  }
+}
+
+function undoLastAction() {
+  if (undoStack.length === 0) {
+    showStatus("⚠️ Nothing to undo", 3000);
+    return;
+  }
+  
+  // Get the last saved state
+  const lastState = undoStack.pop();
+  
+  // Restore tag data
+  tagData = lastState.tagData;
+  
+  // Restore groups data
+  boxGroups = lastState.boxGroups;
+  
+  // Update the storage
+  allImageData[imageName] = tagData;
+  saveAllProgress();
+  saveGroups();
+  
+  // Re-render the boxes
+  renderTags();
+  updateTagLog();
+  
+  // Re-apply group classes
+  Object.entries(boxGroups).forEach(([groupId, tagIndices]) => {
+    tagIndices.forEach(tagIndex => {
+      const box = document.querySelector(`.draw-box[data-tag-index="${tagIndex}"]`);
+      if (box) {
+        box.dataset.groupId = groupId;
+        box.classList.add('grouped');
+      }
+    });
+  });
+  
+  showStatus("↩️ Undo successful", 3000);
+}
+
+
+
+
+
 
 
 
