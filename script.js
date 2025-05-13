@@ -1,4 +1,4 @@
-// ========== GLOBAL STATE ==========
+// ========== GLOBAL STATE P1 ==========
 
 let isDrawing = false;
 let isMultiSelectMode = false;
@@ -62,20 +62,19 @@ imageContainer.addEventListener("mousemove", (e) => {
   currentBox.style.left = `${Math.min(x, startX)}px`;
   currentBox.style.top = `${Math.min(y, startY)}px`;
 
-// Always update the latest tag log entry (whether selected or not)
-const logEntries = document.querySelectorAll(".tag-entry");
-if (logEntries.length > 0) {
-  const lastEntry = logEntries[logEntries.length - 1];
-  const xCoord = Math.round(currentBox.offsetLeft);
-  const yCoord = Math.round(currentBox.offsetTop);
-  const width = Math.round(currentBox.offsetWidth);
-  const height = Math.round(currentBox.offsetHeight);
-  const posDiv = lastEntry.querySelector(".tag-position");
-  if (posDiv) {
-    posDiv.textContent = `(${xCoord}, ${yCoord}) | ${width}×${height}`;
+  // Always update the latest tag log entry (whether selected or not)
+  const logEntries = document.querySelectorAll(".tag-entry");
+  if (logEntries.length > 0) {
+    const lastEntry = logEntries[logEntries.length - 1];
+    const xCoord = Math.round(currentBox.offsetLeft);
+    const yCoord = Math.round(currentBox.offsetTop);
+    const width = Math.round(currentBox.offsetWidth);
+    const height = Math.round(currentBox.offsetHeight);
+    const posDiv = lastEntry.querySelector(".tag-position");
+    if (posDiv) {
+      posDiv.textContent = `(${xCoord}, ${yCoord}) | ${width}×${height}`;
+    }
   }
-}
-
 });
 
 imageContainer.addEventListener("mouseup", (e) => {
@@ -110,19 +109,19 @@ saveTagBtn.addEventListener("click", () => {
   const rect = currentBox.getBoundingClientRect();
   const parentRect = imageContainer.getBoundingClientRect();
 
-  const x = rect.left - parentRect.left;
-  const y = rect.top - parentRect.top;
+  const x = Math.round(rect.left - parentRect.left);
+  const y = Math.round(rect.top - parentRect.top);
 
-const tag = {
-  label: hint.label,
-  codes: hint.covers,
-  severity: hint.severity,
-  x: Math.round(x),
-  y: Math.round(y),
-  width: Math.round(currentBox.offsetWidth),
-  height: Math.round(currentBox.offsetHeight), // ← ✅ Add comma here
-  sof: document.getElementById("sofCheckbox").checked
-};
+  const tag = {
+    label: hint.label,
+    codes: hint.covers,
+    severity: hint.severity,
+    x: x,
+    y: y,
+    width: Math.round(currentBox.offsetWidth),
+    height: Math.round(currentBox.offsetHeight),
+    sof: document.getElementById("sofCheckbox").checked
+  };
 
   tagData.push(tag);
   if (!allImageData[imageName]) allImageData[imageName] = [];
@@ -146,16 +145,10 @@ const tag = {
 });
 
 
-// ========== BOX EDITING FUNCTIONALITY ==========
 
 
 
-
-
-
-
-
-// ========== BOX EDITING FUNCTIONALITY ==========
+// ========== BOX EDITING FUNCTIONALITY P2 ==========
 
 function setupBoxEditing() {
   // Double-click handler for boxes
@@ -191,9 +184,6 @@ function setupBoxEditing() {
     }
   });
 }
-
-
-
 
 function setupKeyboardShortcuts() {
   document.addEventListener('keydown', (e) => {
@@ -240,32 +230,30 @@ function setupKeyboardShortcuts() {
   });
 }
 
-// Initialize features moved to central location
-
-
-
-
-
 function showEditModal(box) {
   const modal = document.getElementById('editBoxModal');
   const rect = box.getBoundingClientRect();
   const containerRect = imageContainer.getBoundingClientRect();
 
-  // Calculate relative coordinates
-  const x = rect.left - containerRect.left;
-  const y = rect.top - containerRect.top;
-  const width = rect.width;
-  const height = rect.height;
+  // Calculate precise coordinates and dimensions
+  // Using fixed integer values instead of getBoundingClientRect which can return floats
+  const x = parseInt(box.style.left, 10);
+  const y = parseInt(box.style.top, 10);
+  const width = parseInt(box.style.width, 10);
+  const height = parseInt(box.style.height, 10);
 
-  // Populate coordinate inputs
-  document.getElementById('editBoxX').value = Math.round(x);
-  document.getElementById('editBoxY').value = Math.round(y);
-  document.getElementById('editBoxW').value = Math.round(width);
-  document.getElementById('editBoxH').value = Math.round(height);
+  // Populate coordinate inputs with exact integers, no decimals
+  document.getElementById('editBoxX').value = x;
+  document.getElementById('editBoxY').value = y;
+  document.getElementById('editBoxW').value = width;
+  document.getElementById('editBoxH').value = height;
   
   // Get current tag data
-  const tagIndex = parseInt(box.dataset.tagIndex);
+  const tagIndex = parseInt(box.dataset.tagIndex, 10);
   const tag = tagData[tagIndex];
+  
+  // Store current box element for exact reference when applying edits
+  modal.dataset.currentBoxId = box.dataset.tagIndex;
   
   // Populate violation dropdown
   populateViolationDropdown(tag);
@@ -277,6 +265,7 @@ function showEditModal(box) {
   modal.style.display = 'block';
   clearSelection();
   box.classList.add('selected');
+  box.classList.add('editing'); // Add class for visual indication
   
   // Focus first field for immediate keyboard entry
   document.getElementById('editBoxX').focus();
@@ -319,15 +308,37 @@ function populateViolationDropdown(tag) {
   });
 }
 
-function applyBoxEdits() {
-  const box = document.querySelector('.draw-box.selected');
-  if (!box) return;
 
-  // Get values from form
-  const newX = parseInt(document.getElementById('editBoxX').value);
-  const newY = parseInt(document.getElementById('editBoxY').value);
-  const newW = parseInt(document.getElementById('editBoxW').value);
-  const newH = parseInt(document.getElementById('editBoxH').value);
+
+
+
+
+
+
+
+
+
+
+
+// ========== P3 ==========
+
+function applyBoxEdits() {
+  const modal = document.getElementById('editBoxModal');
+  const tagIndex = parseInt(modal.dataset.currentBoxId, 10);
+  
+  // Find box by index attribute for more reliability
+  const box = document.querySelector(`.draw-box[data-tag-index="${tagIndex}"]`);
+  if (!box) {
+    showStatus("⚠️ Could not find the box to edit", 3000);
+    hideEditModal();
+    return;
+  }
+
+  // Get exact values from form as integers
+  const newX = parseInt(document.getElementById('editBoxX').value, 10);
+  const newY = parseInt(document.getElementById('editBoxY').value, 10);
+  const newW = parseInt(document.getElementById('editBoxW').value, 10);
+  const newH = parseInt(document.getElementById('editBoxH').value, 10);
   const newViolation = document.getElementById('editBoxViolation').value;
   const newSignOff = document.getElementById('editBoxSignOff').checked;
   
@@ -337,23 +348,30 @@ function applyBoxEdits() {
     return;
   }
   
+  if (newW < 10 || newH < 10) {
+    showStatus("⚠️ Width and height must be at least 10px", 3000);
+    return;
+  }
+  
   // Get selected option to access all violation data
   const selectedOption = document.getElementById('editBoxViolation').selectedOptions[0];
   const newSeverity = selectedOption.dataset.severity;
   const newCodes = JSON.parse(selectedOption.dataset.codes || '[]');
 
-  // Update box position and size
+  // Save state for undo
+  saveToUndoStack();
+
+  // Update box position and size with exact values
   box.style.left = `${newX}px`;
   box.style.top = `${newY}px`;
   box.style.width = `${newW}px`;
   box.style.height = `${newH}px`;
 
-  // Update the associated tag data
-  const tagIndex = parseInt(box.dataset.tagIndex);
+  // Update the associated tag data with exact values
   if (tagIndex >= 0 && tagData[tagIndex]) {
     const tag = tagData[tagIndex];
     
-    // Update position and size
+    // Update position and size with exact integers
     tag.x = newX;
     tag.y = newY;
     tag.width = newW;
@@ -371,13 +389,38 @@ function applyBoxEdits() {
     saveAllProgress();
   }
 
+  box.classList.remove('editing'); // Remove editing indicator
   hideEditModal();
   showStatus("✅ Box updated", 2000);
 }
 
 function hideEditModal() {
-  document.getElementById('editBoxModal').style.display = 'none';
+  const modal = document.getElementById('editBoxModal');
+  modal.style.display = 'none';
+  
+  // Find and remove any editing class
+  const editingBox = document.querySelector('.draw-box.editing');
+  if (editingBox) {
+    editingBox.classList.remove('editing');
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ========== P4 ==========
 
 function copySelectedBoxes() {
   const selectedBoxes = document.querySelectorAll('.draw-box.selected');
@@ -389,7 +432,7 @@ function copySelectedBoxes() {
   copiedTags = [];
   
   selectedBoxes.forEach(box => {
-    const tagIndex = parseInt(box.dataset.tagIndex);
+    const tagIndex = parseInt(box.dataset.tagIndex, 10);
     if (tagIndex >= 0 && tagData[tagIndex]) {
       // Create a deep copy of the tag
       copiedTags.push(JSON.parse(JSON.stringify(tagData[tagIndex])));
@@ -405,6 +448,9 @@ function pasteBoxes() {
     return;
   }
   
+  // Save state for undo
+  saveToUndoStack();
+  
   // Clear any current selection
   clearSelection();
   
@@ -414,7 +460,7 @@ function pasteBoxes() {
   
   // Create new boxes from copied tags
   copiedTags.forEach(originalTag => {
-    // Create a new tag with offset position
+    // Create a new tag with offset position using exact integer values
     const newTag = JSON.parse(JSON.stringify(originalTag));
     newTag.x += OFFSET_X;
     newTag.y += OFFSET_Y;
@@ -434,7 +480,7 @@ function pasteBoxes() {
     // Add the new tag to the data
     tagData.push(newTag);
     
-    // Create and render the new box
+    // Create and render the new box with exact integer dimensions
     const box = document.createElement("div");
     box.className = "draw-box selected";
     box.style.left = `${newTag.x}px`;
@@ -464,11 +510,6 @@ function pasteBoxes() {
   showStatus(`✅ Pasted ${copiedTags.length} box(es)`, 3000);
 }
 
-
-
-
-
-
 function groupSelectedBoxes() {
   const selectedBoxes = document.querySelectorAll('.draw-box.selected');
   
@@ -488,7 +529,7 @@ function groupSelectedBoxes() {
   
   // Add a data attribute to each box in the group
   selectedBoxes.forEach(box => {
-    const tagIndex = parseInt(box.dataset.tagIndex);
+    const tagIndex = parseInt(box.dataset.tagIndex, 10);
     if (tagIndex >= 0) {
       // Store group info on the box element
       box.dataset.groupId = groupId;
@@ -563,6 +604,15 @@ function ungroupSelectedBoxes() {
 
 
 
+
+
+
+
+
+
+
+// ========== P5 ==========
+
 function deleteSelectedBoxes() {
   const selectedBoxes = document.querySelectorAll('.draw-box.selected');
   
@@ -580,7 +630,7 @@ function deleteSelectedBoxes() {
   
   // First pass: identify what we're deleting and which groups need updates
   selectedBoxes.forEach(box => {
-    const tagIndex = parseInt(box.dataset.tagIndex);
+    const tagIndex = parseInt(box.dataset.tagIndex, 10);
     if (tagIndex >= 0) {
       deletedIndices.push(tagIndex);
       
@@ -634,17 +684,6 @@ function deleteSelectedBoxes() {
   showStatus(`🗑️ Deleted ${selectedBoxes.length} box(es)`, 3000);
 }
 
-
-
-
-
-
-
-
-
-
-
-
 function saveGroups() {
   // Store group information in local storage
   try {
@@ -676,13 +715,6 @@ function loadGroups() {
     console.error("Error loading groups:", e);
   }
 }
-
-
-
-
-
-
-
 
 function saveToUndoStack() {
   // Save current state to undo stack
@@ -747,10 +779,19 @@ function undoLastAction() {
 
 
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', setupBoxEditing);
 
-// ========== PREVIEW MODAL LOGIC ==========
+
+
+
+// ========== P6 ==========
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  setupBoxEditing();
+  setupKeyboardShortcuts();
+  setupMultiBoxMovement();
+  loadGroups(); // Load saved groups
+});
 
 // ========== PREVIEW MODAL LOGIC ==========
 
@@ -809,9 +850,6 @@ previewConfirm.addEventListener("click", () => {
   previewModal.style.display = "none";
 });
 
-
-
-
 // ========== RADIO BUTTON LOGIC (REVISED WITH DATE BUTTONS) ==========
 
 const creditorRadioGroup = document.getElementById("creditorRadioGroup");
@@ -861,6 +899,11 @@ document.querySelectorAll('input[name="bureau"]').forEach(radio => {
 
 
 
+
+
+
+// ========== P7 ==========
+
 document.querySelectorAll('input[name="creditor"]').forEach(radio => {
   radio.addEventListener("change", () => {
     const bureau = getSelectedBureau();
@@ -905,6 +948,15 @@ document.querySelectorAll('input[name="creditor"]').forEach(radio => {
 
 
 
+
+
+
+
+
+
+
+// ========== P8 ==========
+
 function loadRemoteImage(fullImageName, bureau) {
   // Ensure .png is only added once
   imageName = fullImageName.endsWith(".png") ? fullImageName : `${fullImageName}.png`;
@@ -934,11 +986,6 @@ function loadRemoteImage(fullImageName, bureau) {
     showStatus("❌ Image failed to load: " + imagePath, 4000);
   };
 }
-
-
-
-
-
 
 // ========== HINTS + POPUP ==========
 
@@ -1012,9 +1059,6 @@ function clearCanvas() {
   [...imageContainer.querySelectorAll(".draw-box")].forEach(el => el.remove());
 }
 
-
-
-
 function clearSelection() {
   document.querySelectorAll(".draw-box.selected").forEach(box => box.classList.remove("selected"));
 }
@@ -1038,16 +1082,34 @@ function selectGroup(groupId) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ========== P9 ==========
+
 function renderTags() {
   clearCanvas();
   
-  // Ensure we're working with fresh data (recommended addition)
+  // Ensure we're working with fresh data
   tagData = allImageData[imageName] || [];
   
   // Track index for proper tag association
   tagData.forEach((tag, index) => {
     const box = document.createElement("div");
     box.className = "draw-box";
+    
+    // Use exact integer values for dimensions
     box.style.left = `${tag.x}px`;
     box.style.top = `${tag.y}px`;
     box.style.width = `${tag.width}px`;
@@ -1063,7 +1125,7 @@ function renderTags() {
       }
     }
     
-    // Drag logic - simplified since makeBoxInteractive handles this now
+    // Drag logic
     box.addEventListener("mousedown", (e) => {
       if (e.target.classList.contains("resize-handle")) return;
       e.stopPropagation();
@@ -1099,38 +1161,13 @@ function renderTags() {
   });
 }
 
-// Add this helper function after the renderTags function
-function selectGroup(groupId) {
-  if (!groupId) return false;
-  
-  // Find all boxes with this group ID
-  const groupBoxes = document.querySelectorAll(`.draw-box[data-group-id="${groupId}"]`);
-  
-  if (groupBoxes.length === 0) return false;
-  
-  // Select all boxes in the group
-  groupBoxes.forEach(box => {
-    box.classList.add("selected");
-  });
-  
-  return true;
-}
-
-
-
-
-
-
-
-
-
 function makeBoxInteractive(box, tagArray) {
   let offsetX, offsetY, isDragging = false;
 
   // Store the tag index on the box when making it interactive
   if (!box.dataset.tagIndex) {
-    const x = parseInt(box.style.left);
-    const y = parseInt(box.style.top);
+    const x = parseInt(box.style.left, 10);
+    const y = parseInt(box.style.top, 10);
     const tagIndex = tagArray.findIndex(t => t.x === x && t.y === y);
     if (tagIndex !== -1) box.dataset.tagIndex = tagIndex;
   }
@@ -1138,49 +1175,63 @@ function makeBoxInteractive(box, tagArray) {
   // Make box focusable for keyboard interactions
   box.setAttribute('tabindex', '0');
   
-
   // Mouse drag handling
-box.addEventListener("mousedown", (e) => {
-  if (e.target.classList.contains("resize-handle")) return;
-  e.stopPropagation();
-  
-  // Check if we're part of a multi-selection
-  const selectedBoxes = document.querySelectorAll('.draw-box.selected');
-  const isPartOfMultiSelection = selectedBoxes.length > 1 && box.classList.contains('selected');
-  
-  // If this is part of multi-selection, let the multi-box handler take over
-  if (isPartOfMultiSelection) {
-    return; // The setupMultiBoxMovement handler will handle this
-  }
-  
-  // Check if this box is part of a group
-  const groupId = box.dataset.groupId;
-  
-  // Otherwise, handle as a single box drag
-  isDragging = true;
-  offsetX = e.offsetX;
-  offsetY = e.offsetY;
-  
-  // If shift key is pressed, allow multi-select without clearing
-  if (!e.shiftKey) {
-    clearSelection();
+  box.addEventListener("mousedown", (e) => {
+    if (e.target.classList.contains("resize-handle")) return;
+    e.stopPropagation();
     
-    // If box is part of a group and not using shift-select, select the whole group
-    if (groupId && !e.shiftKey) {
-      selectGroup(groupId);
-      return; // Exit early as we've handled selection
+    // Check if we're part of a multi-selection
+    const selectedBoxes = document.querySelectorAll('.draw-box.selected');
+    const isPartOfMultiSelection = selectedBoxes.length > 1 && box.classList.contains('selected');
+    
+    // If this is part of multi-selection, let the multi-box handler take over
+    if (isPartOfMultiSelection) {
+      return; // The setupMultiBoxMovement handler will handle this
     }
-  }
-  
-  // Add selection to the clicked box
-  box.classList.add("selected");
-  box.focus(); // Focus the box when selected
-});
+    
+    // Check if this box is part of a group
+    const groupId = box.dataset.groupId;
+    
+    // Otherwise, handle as a single box drag
+    isDragging = true;
+    offsetX = e.offsetX;
+    offsetY = e.offsetY;
+    
+    // If shift key is pressed, allow multi-select without clearing
+    if (!e.shiftKey) {
+      clearSelection();
+      
+      // If box is part of a group and not using shift-select, select the whole group
+      if (groupId && !e.shiftKey) {
+        selectGroup(groupId);
+        return; // Exit early as we've handled selection
+      }
+    }
+    
+    // Add selection to the clicked box
+    box.classList.add("selected");
+    box.focus(); // Focus the box when selected
+  });
 
 
 
 
-  // Keyboard arrow key movement
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ========== P10 ==========
+
+// Keyboard arrow key movement
   box.addEventListener("keydown", (e) => {
     if (!box.classList.contains("selected")) return;
     
@@ -1189,10 +1240,10 @@ box.addEventListener("mousedown", (e) => {
       e.preventDefault();
       const step = e.shiftKey ? 10 : 1; // Larger steps when Shift is held
       const container = imageContainer.getBoundingClientRect();
-      let x = parseInt(box.style.left);
-      let y = parseInt(box.style.top);
-      const width = parseInt(box.style.width);
-      const height = parseInt(box.style.height);
+      let x = parseInt(box.style.left, 10);
+      let y = parseInt(box.style.top, 10);
+      const width = parseInt(box.style.width, 10);
+      const height = parseInt(box.style.height, 10);
 
       switch(e.key) {
         case 'ArrowUp': y = Math.max(0, y - step); break;
@@ -1201,13 +1252,14 @@ box.addEventListener("mousedown", (e) => {
         case 'ArrowRight': x = Math.min(container.width - width, x + step); break;
       }
 
-      // Update position
+      // Update position with exact integer values
       box.style.left = `${x}px`;
       box.style.top = `${y}px`;
 
-      // Update data model
+      // Update data model with exact integers
       if (box.dataset.tagIndex !== undefined) {
-        const tag = tagArray[box.dataset.tagIndex];
+        const tagIndex = parseInt(box.dataset.tagIndex, 10);
+        const tag = tagArray[tagIndex];
         if (tag) {
           tag.x = x;
           tag.y = y;
@@ -1222,29 +1274,33 @@ box.addEventListener("mousedown", (e) => {
   window.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
     const rect = imageContainer.getBoundingClientRect();
-    const newX = e.clientX - rect.left - offsetX;
-    const newY = e.clientY - rect.top - offsetY;
+    const newX = Math.round(e.clientX - rect.left - offsetX);
+    const newY = Math.round(e.clientY - rect.top - offsetY);
+    
+    // Use integer values for position
     box.style.left = `${newX}px`;
     box.style.top = `${newY}px`;
 
-    // Update the associated tag data
+    // Update the associated tag data with integers
     if (box.dataset.tagIndex !== undefined) {
-      const tag = tagArray[box.dataset.tagIndex];
+      const tagIndex = parseInt(box.dataset.tagIndex, 10);
+      const tag = tagArray[tagIndex];
       if (tag) {
-        tag.x = Math.round(newX);
-        tag.y = Math.round(newY);
-        tag.width = Math.round(parseInt(box.style.width));
-        tag.height = Math.round(parseInt(box.style.height));
+        tag.x = newX;
+        tag.y = newY;
+        // Width and height should already be integers
+        tag.width = parseInt(box.style.width, 10);
+        tag.height = parseInt(box.style.height, 10);
         updateTagLog();
       }
     }
 
     const logEntry = document.querySelector(".tag-entry.selected");
     if (logEntry) {
-      const xCoord = Math.round(box.offsetLeft);
-      const yCoord = Math.round(box.offsetTop);
-      const width = Math.round(box.offsetWidth);
-      const height = Math.round(box.offsetHeight);
+      const xCoord = newX;
+      const yCoord = newY;
+      const width = parseInt(box.style.width, 10);
+      const height = parseInt(box.style.height, 10);
       logEntry.querySelector(".tag-position").textContent =
         `(${xCoord}, ${yCoord}) | ${width}×${height}`;
     }
@@ -1271,10 +1327,10 @@ box.addEventListener("mousedown", (e) => {
 
       const startX = e.clientX;
       const startY = e.clientY;
-      const startLeft = parseInt(box.style.left);
-      const startTop = parseInt(box.style.top);
-      const startWidth = parseInt(box.style.width);
-      const startHeight = parseInt(box.style.height);
+      const startLeft = parseInt(box.style.left, 10);
+      const startTop = parseInt(box.style.top, 10);
+      const startWidth = parseInt(box.style.width, 10);
+      const startHeight = parseInt(box.style.height, 10);
 
       function doResize(moveEvent) {
         if (!isResizing) return;
@@ -1282,42 +1338,48 @@ box.addEventListener("mousedown", (e) => {
         const dx = moveEvent.clientX - startX;
         const dy = moveEvent.clientY - startY;
 
+        // Use integers for all position/size calculations
         let newLeft = startLeft;
         let newTop = startTop;
         let newWidth = startWidth;
         let newHeight = startHeight;
 
         if (pos.includes("l")) {
-          newLeft += dx;
-          newWidth -= dx;
+          newLeft = startLeft + dx;
+          newWidth = startWidth - dx;
         }
         if (pos.includes("r")) {
-          newWidth += dx;
+          newWidth = startWidth + dx;
         }
         if (pos.includes("t")) {
-          newTop += dy;
-          newHeight -= dy;
+          newTop = startTop + dy;
+          newHeight = startHeight - dy;
         }
         if (pos.includes("b")) {
-          newHeight += dy;
+          newHeight = startHeight + dy;
         }
 
-        newWidth = Math.max(20, newWidth);
-        newHeight = Math.max(20, newHeight);
+        // Ensure minimum size and use rounded integers
+        newWidth = Math.max(20, Math.round(newWidth));
+        newHeight = Math.max(20, Math.round(newHeight));
+        newLeft = Math.round(newLeft);
+        newTop = Math.round(newTop);
 
+        // Apply integer values to the box
         box.style.left = `${newLeft}px`;
         box.style.top = `${newTop}px`;
         box.style.width = `${newWidth}px`;
         box.style.height = `${newHeight}px`;
 
-        // Update the associated tag data
+        // Update the associated tag data with integer values
         if (box.dataset.tagIndex !== undefined) {
-          const tag = tagArray[box.dataset.tagIndex];
+          const tagIndex = parseInt(box.dataset.tagIndex, 10);
+          const tag = tagArray[tagIndex];
           if (tag) {
-            tag.x = Math.round(newLeft);
-            tag.y = Math.round(newTop);
-            tag.width = Math.round(newWidth);
-            tag.height = Math.round(newHeight);
+            tag.x = newLeft;
+            tag.y = newTop;
+            tag.width = newWidth;
+            tag.height = newHeight;
             updateTagLog();
           }
         }
@@ -1325,7 +1387,7 @@ box.addEventListener("mousedown", (e) => {
         const logEntry = document.querySelector(".tag-entry.selected");
         if (logEntry) {
           logEntry.querySelector(".tag-position").textContent =
-            `(${Math.round(newLeft)}, ${Math.round(newTop)}) | ${Math.round(newWidth)}×${Math.round(newHeight)}`;
+            `(${newLeft}, ${newTop}) | ${newWidth}×${newHeight}`;
         }
       }
 
@@ -1348,6 +1410,16 @@ box.addEventListener("mousedown", (e) => {
 
 
 
+
+
+
+
+
+
+
+
+
+// ========== P11 ==========
 
 function setupMultiBoxMovement() {
   let isDraggingMultiple = false;
@@ -1380,14 +1452,14 @@ function setupMultiBoxMovement() {
       startMouseX = e.clientX;
       startMouseY = e.clientY;
       
-      // Store the starting positions of all selected boxes
+      // Store the starting positions of all selected boxes with integer values
       boxStartPositions = [];
       selectedBoxes.forEach(box => {
         boxStartPositions.push({
           box: box,
-          startX: parseInt(box.style.left),
-          startY: parseInt(box.style.top),
-          tagIndex: parseInt(box.dataset.tagIndex)
+          startX: parseInt(box.style.left, 10),
+          startY: parseInt(box.style.top, 10),
+          tagIndex: parseInt(box.dataset.tagIndex, 10)
         });
       });
       
@@ -1400,10 +1472,11 @@ function setupMultiBoxMovement() {
   document.addEventListener("mousemove", (e) => {
     if (!isDraggingMultiple) return;
     
-    const deltaX = e.clientX - startMouseX;
-    const deltaY = e.clientY - startMouseY;
+    // Use integer values for delta calculations
+    const deltaX = Math.round(e.clientX - startMouseX);
+    const deltaY = Math.round(e.clientY - startMouseY);
     
-    // Move all boxes by the same delta
+    // Move all boxes by the same delta, ensuring integer values
     boxStartPositions.forEach(item => {
       const newX = item.startX + deltaX;
       const newY = item.startY + deltaY;
@@ -1411,7 +1484,7 @@ function setupMultiBoxMovement() {
       item.box.style.left = `${newX}px`;
       item.box.style.top = `${newY}px`;
       
-      // Update the data model
+      // Update the data model with integers
       if (item.tagIndex >= 0 && tagData[item.tagIndex]) {
         tagData[item.tagIndex].x = newX;
         tagData[item.tagIndex].y = newY;
@@ -1436,46 +1509,66 @@ function setupMultiBoxMovement() {
   });
 }
 
-// Initialize the multi-box movement functionality
-document.addEventListener('DOMContentLoaded', () => {
-  setupKeyboardShortcuts();
-  setupMultiBoxMovement();
-  loadGroups(); // Add this line to load saved groups
-});
-
-
-
-
-
-
-
-
-
-
 function updateTagLog() {
   const log = document.getElementById("tag-log");
   log.innerHTML = "";
 
   const mode = document.getElementById("modeSelector")?.value || "unspecified";
 
-  tagData.forEach(tag => {
+  tagData.forEach((tag, index) => {
     const div = document.createElement("div");
     div.className = "tag-entry";
+    
+    // Add selected class if corresponding box is selected
+    const box = document.querySelector(`.draw-box[data-tag-index="${index}"]`);
+    if (box && box.classList.contains('selected')) {
+      div.classList.add('selected');
+    }
+    
     const severity = tag.severity || "❓";
     const label = tag.label || "(No label)";
     const codes = tag.codes?.join(", ") || "(No codes)";
     const sofNote = tag.sof ? " [SOF]" : "";
-const pos = `(${tag.x ?? "?"}, ${tag.y ?? "?"}) | ${tag.width ?? "?"}×${tag.height ?? "?"} [Mode: ${mode}]${sofNote}`;
+    // Ensure all values are integers for display
+    const x = typeof tag.x === 'number' ? Math.round(tag.x) : tag.x ?? "?";
+    const y = typeof tag.y === 'number' ? Math.round(tag.y) : tag.y ?? "?";
+    const width = typeof tag.width === 'number' ? Math.round(tag.width) : tag.width ?? "?";
+    const height = typeof tag.height === 'number' ? Math.round(tag.height) : tag.height ?? "?";
+    
+    const pos = `(${x}, ${y}) | ${width}×${height} [Mode: ${mode}]${sofNote}`;
     
     div.innerHTML = `
       <div class="tag-label">${severity} <strong>${label}</strong></div>
       <div class="tag-codes">${codes}</div>
       <div class="tag-position">${pos}</div>
     `;
+    
+    // Add click handler to select corresponding box
+    div.addEventListener('click', () => {
+      if (!box) return;
+      
+      // If shift key is down, add to selection without clearing
+      if (!event.shiftKey) {
+        clearSelection();
+      }
+      
+      box.classList.add('selected');
+      div.classList.add('selected');
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+    
     log.appendChild(div);
   });
 }
 
+
+
+
+
+
+
+
+// ========== P12 ==========
 
 // ========== STATUS MESSAGES ==========
 
@@ -1506,11 +1599,12 @@ function showStatus(message, duration = 3000) {
   }
   
   // Clear after duration
-  statusBox._timeoutId = setTimeout(() => {
-    statusBox.style.opacity = "0";
-  }, duration);
+  if (duration > 0) {
+    statusBox._timeoutId = setTimeout(() => {
+      statusBox.style.opacity = "0";
+    }, duration);
+  }
 }
-
 
 // ========== TOP PANEL BUTTONS ==========
 
@@ -1534,14 +1628,24 @@ document.getElementById("deleteSelected").addEventListener("click", async functi
       return;
     }
 
-    const x = parseInt(selectedBox.style.left);
-    const y = parseInt(selectedBox.style.top);
-    tagData = tagData.filter(tag => tag.x !== x || tag.y !== y);
-    allImageData[imageName] = tagData;
-    selectedBox.remove();
-    updateTagLog();
-    await saveAllProgress();
-    showStatus("🗑️ Tag deleted", 3000);
+    // Save for undo
+    saveToUndoStack();
+
+    // Use the dataset property to find the index
+    const tagIndex = parseInt(selectedBox.dataset.tagIndex, 10);
+    if (tagIndex >= 0) {
+      tagData.splice(tagIndex, 1);
+      allImageData[imageName] = tagData;
+      selectedBox.remove();
+      
+      // Re-render to ensure all indices are correct
+      renderTags();
+      updateTagLog();
+      await saveAllProgress();
+      showStatus("🗑️ Tag deleted", 3000);
+    } else {
+      showStatus("⚠️ Could not identify tag to delete", 3000);
+    }
   } catch (error) {
     console.error("Delete error:", error);
     showStatus("⚠️ Error deleting tag", 3000);
@@ -1559,6 +1663,9 @@ document.getElementById("clearImageData").addEventListener("click", async functi
     if (!confirm("Are you sure you want to delete all tags for this image?")) {
       return;
     }
+
+    // Save for undo
+    saveToUndoStack();
 
     tagData = [];
     allImageData[imageName] = [];
@@ -1583,6 +1690,8 @@ document.getElementById("clearAllData").addEventListener("click", async function
     if (!confirm("Are you sure you want to delete ALL tags for EVERY image?")) {
       return;
     }
+
+    // We don't save for undo here since it's a global action
 
     tagData = [];
     allImageData = {};
@@ -1620,6 +1729,16 @@ document.getElementById("saveProgress").addEventListener("click", async function
   }
 });
 
+// Toggle Multi-Select Button
+document.getElementById("toggleMultiSelect").addEventListener("click", function() {
+  const btn = this;
+  isMultiSelectMode = !isMultiSelectMode;
+  btn.textContent = isMultiSelectMode ? "Multi: ON" : "Multi: OFF";
+  btn.classList.toggle('button-active', isMultiSelectMode);
+  
+  showStatus(`🔢 Multi-select mode ${isMultiSelectMode ? 'enabled' : 'disabled'}`, 2000);
+});
+
 // ✅ Export CSV function (called after preview confirmation)
 async function exportCSV() {
   const btn = document.getElementById("exportCSV");
@@ -1641,18 +1760,18 @@ async function exportCSV() {
 
     const allTags = Object.entries(allImageData).flatMap(([imgName, tags]) => {
       return tags.map(tag => [
-  escapeCSV(imgName),
-  escapeCSV(tag.severity),
-  escapeCSV(tag.label),
-  escapeCSV(tag.codes.join("; ")),
-  tag.x,
-  tag.y,
-  tag.width,
-  tag.height,
-  escapeCSV(mode),
-  tag.sof ? "TRUE" : "FALSE"
- ]);
-});
+        escapeCSV(imgName),
+        escapeCSV(tag.severity),
+        escapeCSV(tag.label),
+        escapeCSV(tag.codes.join("; ")),
+        tag.x,
+        tag.y,
+        tag.width,
+        tag.height,
+        escapeCSV(mode),
+        tag.sof ? "TRUE" : "FALSE"
+      ]);
+    });
 
     if (!allTags.length) {
       showStatus("⚠️ No data to export", 3000);
@@ -1661,8 +1780,8 @@ async function exportCSV() {
 
     // Create header row with proper escaping
     const headers = [
-  "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height", "Mode", "SOF"
-].map(escapeCSV);
+      "Image", "Severity", "Label", "Codes", "X", "Y", "Width", "Height", "Mode", "SOF"
+    ].map(escapeCSV);
 
     // Build CSV content
     const csvContent = [
@@ -1694,3 +1813,5 @@ async function exportCSV() {
 document.getElementById("exportCSV").addEventListener("click", function () {
   openPreviewModal(exportCSV);
 });
+
+
